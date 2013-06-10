@@ -90,6 +90,63 @@ Product.tags_contains("kitchen")                  # tags containing a single val
 Product.tags_contains(["housewares", "kitchen"])  # tags containing a number of values
 ```
 
+### Single-table Inheritance
+
+One of the big issues with `ActiveRecord` single-table inheritance (STI)
+is sparse columns.  Essentially, as sub-types of the original table
+diverge further from their parent more columns are left empty in a given
+table.  Postgres' `hstore` type provides part of the solution in that
+the values in an `hstore` column does not impose a structure - different
+rows can have different values.
+
+We set up our table with an hstore field:
+
+```ruby
+# db/migration/<timestamp>_create_players_table.rb
+class CreateVehiclesTable < ActiveRecord::Migration
+  def change
+    create_table :vehicles do |t|
+      t.string :make
+      t.string :model
+      t.integer :model_year
+      t.string :type
+      t.hstore :data
+    end
+  end
+end
+```
+
+And for our models:
+
+```ruby
+# app/models/vehicle.rb
+class Player < ActiveRecord::Base
+end
+
+# app/models/vehicles/automobile.rb
+class Automobile < Vehicle
+  hstore_accessor :data,
+    axle_count: :integer,
+    weight: :float,
+    engine_details: :hash
+end
+
+# app/models/vehicles/airplane.rb
+class Airplane < Vehicle
+  hstore_accessor :data,
+    engine_type: :string,
+    safety_rating: :integer,
+    features: :hash
+end
+```
+
+From here any attributes specific to any sub-class can be stored in the
+`hstore` column avoiding sparse data.  Indices can also be created on
+individual fields in an `hstore` column.
+
+This approach was originally concieved by Joe Hirn in [this blog
+post](http://www.devmynd.com/blog/2013-3-single-table-inheritance-hstore-lovely-combination).
+
 ## Contributing
 
 1. Fork it
