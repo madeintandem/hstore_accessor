@@ -86,10 +86,8 @@ For `array` types, two scopes are created:
 
 ```ruby
 Product.tags_eq(["housewares", "kitchen"])        # tags equaling
-Product.tags_contains("kitchen")                  # tags containing a
-single value
-Product.tags_contains(["housewares", "kitchen"])  # tags containing a
-number of values
+Product.tags_contains("kitchen")                  # tags containing a single value
+Product.tags_contains(["housewares", "kitchen"])  # tags containing a number of values
 ```
 
 ## Contributing
