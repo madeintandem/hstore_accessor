@@ -27,7 +27,7 @@ Or install it yourself as:
 The `hstore_accessor` method accepts the name of the hstore column you'd
 like to use and a hash with keys representing fields and values
 indicating the type to be stored in that field.  The available types
-are: `string`, `integer`, `float`, `array`, and `hash`.
+are: `string`, `integer`, `float`, `time`, `array`, and `hash`.
 
 ```ruby
 class Product < ActiveRecord::Base
@@ -36,6 +36,7 @@ class Product < ActiveRecord::Base
     color: :string,
     weight: :integer,
     price: :float,
+    built_at: :time,
     tags: :array,
     ratings: :hash
 
@@ -49,6 +50,7 @@ p = Product.new
 p.color = "green"
 p.weight = 34
 p.price = 99.95
+p.built_at = Time.now - 10.days
 p.tags = ["housewares", "kitchen"]
 p.ratings = { user_a: 3, user_b: 4 }
 ```
@@ -63,7 +65,9 @@ p.tags #=> ["housewares", "kitchen"]
 ### Scopes
 
 The `hstore_accessor` macro also creates scopes for `string`, `integer`,
-`float`, and `array` fields.
+`float`, `time`, and `array` fields.
+
+#### String Fields
 
 For `string` types, a `with_<key>` scope is created which checks for
 equality.
@@ -71,6 +75,8 @@ equality.
 ```ruby
 Product.with_color("green")
 ```
+
+#### Integer and Float Fields
 
 For `integer` and `float` types five scopes are created:
 
@@ -81,6 +87,18 @@ Product.price_eq(240.00)    # price equal to
 Product.price_gte(240.00)   # price greater than or equal to
 Product.price_gt(240.00)    # price greater than
 ```
+
+#### Time Fields
+
+For `time` fileds, three scopes are provided:
+
+```ruby
+Product.built_at_before(Time.now)         # built before the given time
+Product.built_at_eq(Time.now - 10.days)   # built at an exact time
+Product.built_at_after(Time.now - 4.days) # built after the given time
+```
+
+#### Array Fields
 
 For `array` types, two scopes are created:
 

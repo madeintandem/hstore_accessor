@@ -7,7 +7,8 @@ class Product < ActiveRecord::Base
     price: :integer,
     weight: :float,
     tags: :array,
-    reviews: :hash
+    reviews: :hash,
+    build_timestamp: :time
 end
 
 describe HstoreAccessor do
@@ -41,9 +42,10 @@ describe HstoreAccessor do
 
   describe "scopes" do
 
-    let!(:product_a) { Product.create(color: "green",  price: 10, weight: 10.1, tags: ["tag1", "tag2", "tag3"]) }
-    let!(:product_b) { Product.create(color: "orange", price: 20, weight: 20.2, tags: ["tag2", "tag3", "tag4"]) }
-    let!(:product_c) { Product.create(color: "blue",   price: 30, weight: 30.3, tags: ["tag3", "tag4", "tag5"]) }
+    let!(:timestamp) { Time.now }
+    let!(:product_a) { Product.create(color: "green",  price: 10, weight: 10.1, tags: ["tag1", "tag2", "tag3"], build_timestamp: (timestamp - 10.days)) }
+    let!(:product_b) { Product.create(color: "orange", price: 20, weight: 20.2, tags: ["tag2", "tag3", "tag4"], build_timestamp: (timestamp - 5.days)) }
+    let!(:product_c) { Product.create(color: "blue",   price: 30, weight: 30.3, tags: ["tag3", "tag4", "tag5"], build_timestamp: timestamp) }
 
     context "for string fields support" do
 
@@ -77,7 +79,7 @@ describe HstoreAccessor do
 
     end
 
-    context "for float fields" do
+    context "for float fields support" do
 
       it "less than" do
         expect(Product.weight_lt(20.0).to_a).to eq [product_a]
@@ -101,7 +103,7 @@ describe HstoreAccessor do
 
     end
 
-    context "for array fields" do
+    context "for array fields support" do
 
       it "equality" do
         expect(Product.tags_eq(["tag1", "tag2", "tag3"]).to_a).to eq [product_a]
@@ -112,7 +114,23 @@ describe HstoreAccessor do
         expect(Product.tags_contains(["tag2", "tag3"]).to_a).to eq [product_a, product_b]
       end
 
-    end 
+    end
+
+    context "for time fields support" do
+
+      it "before" do
+        expect(Product.build_timestamp_before(timestamp)).to eq [product_a, product_b]
+      end
+
+      it "equality" do
+        expect(Product.build_timestamp_eq(timestamp)).to eq [product_c]
+      end
+
+      it "after" do
+        expect(Product.build_timestamp_after(timestamp - 6.days)).to eq [product_b, product_c]
+      end
+
+    end
 
   end
 
@@ -153,6 +171,14 @@ describe HstoreAccessor do
       product.save
       product.reload
       expect(product.reviews).to eq({ "user_123" => "4 stars", "user_994" => "3 stars" })
+    end
+
+    it "correctly stores time values" do
+      timestamp = Time.now - 10.days
+      product.build_timestamp = timestamp
+      product.save
+      product.reload
+      expect(product.build_timestamp.to_i).to eq timestamp.to_i
     end
 
     it "setters call the _will_change! method of the store attribute" do
