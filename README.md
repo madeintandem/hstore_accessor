@@ -120,7 +120,7 @@ And for our models:
 
 ```ruby
 # app/models/vehicle.rb
-class Player < ActiveRecord::Base
+class Vehicle < ActiveRecord::Base
 end
 
 # app/models/vehicles/automobile.rb
