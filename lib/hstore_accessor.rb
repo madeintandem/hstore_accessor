@@ -22,7 +22,7 @@ module HstoreAccessor
 
   DESERIALIZERS = {
     :array    => -> value { (value && value.split(SEPARATOR)) || [] },
-    :hash     => -> value { JSON.parse(value) },
+    :hash     => -> value { (value && JSON.parse(value)) || {} },
     :integer  => -> value { value.to_i },
     :float    => -> value { value.to_f },
     :time     => -> value { Time.at(value.to_i) },

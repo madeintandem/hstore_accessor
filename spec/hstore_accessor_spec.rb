@@ -180,6 +180,7 @@ describe HstoreAccessor do
     end
 
     it "returns an empty array if an array value is not set" do
+      expect(Product.new.tags).to eq []
       product.tags = nil
       product.save
       product.reload
@@ -194,6 +195,7 @@ describe HstoreAccessor do
     end
 
     it "returns an empty hash if a hash value is not set" do
+      expect(Product.new.reviews).to eq({})
       product.reviews = nil
       product.save
       product.reload
