@@ -6,9 +6,10 @@ class Product < ActiveRecord::Base
     color: :string,
     price: :integer,
     weight: :float,
+    popular: :boolean,
+    build_timestamp: :time,
     tags: :array,
-    reviews: :hash,
-    build_timestamp: :time
+    reviews: :hash
 end
 
 describe HstoreAccessor do
@@ -43,9 +44,9 @@ describe HstoreAccessor do
   describe "scopes" do
 
     let!(:timestamp) { Time.now }
-    let!(:product_a) { Product.create(color: "green",  price: 10, weight: 10.1, tags: ["tag1", "tag2", "tag3"], build_timestamp: (timestamp - 10.days)) }
-    let!(:product_b) { Product.create(color: "orange", price: 20, weight: 20.2, tags: ["tag2", "tag3", "tag4"], build_timestamp: (timestamp - 5.days)) }
-    let!(:product_c) { Product.create(color: "blue",   price: 30, weight: 30.3, tags: ["tag3", "tag4", "tag5"], build_timestamp: timestamp) }
+    let!(:product_a) { Product.create(color: "green",  price: 10, weight: 10.1, tags: ["tag1", "tag2", "tag3"], popular: true,  build_timestamp: (timestamp - 10.days)) }
+    let!(:product_b) { Product.create(color: "orange", price: 20, weight: 20.2, tags: ["tag2", "tag3", "tag4"], popular: false, build_timestamp: (timestamp - 5.days)) }
+    let!(:product_c) { Product.create(color: "blue",   price: 30, weight: 30.3, tags: ["tag3", "tag4", "tag5"], popular: true,  build_timestamp: timestamp) }
 
     context "for string fields support" do
 
@@ -132,6 +133,18 @@ describe HstoreAccessor do
 
     end
 
+    context "for boolean field support" do
+
+      it "true" do
+        expect(Product.is_popular).to eq [product_a, product_c]
+      end
+
+      it "false" do
+        expect(Product.not_popular).to eq [product_b]
+      end
+
+    end
+
   end
 
   context "when assigning values it" do
@@ -166,11 +179,25 @@ describe HstoreAccessor do
       expect(product.tags).to eq ["household", "living room", "kitchen"]
     end
 
+    it "returns an empty array if an array value is not set" do
+      product.tags = nil
+      product.save
+      product.reload
+      expect(product.tags).to eq []
+    end
+
     it "correctly stores hash values" do
       product.reviews = { "user_123" => "4 stars", "user_994" => "3 stars" }
       product.save
       product.reload
       expect(product.reviews).to eq({ "user_123" => "4 stars", "user_994" => "3 stars" })
+    end
+
+    it "returns an empty hash if a hash value is not set" do
+      product.reviews = nil
+      product.save
+      product.reload
+      expect(product.reviews).to eq({})
     end
 
     it "correctly stores time values" do

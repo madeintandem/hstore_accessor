@@ -6,7 +6,7 @@ module HstoreAccessor
 
   InvalidDataTypeError = Class.new(StandardError)
 
-  VALID_TYPES = [:string, :integer, :float, :time, :array, :hash]
+  VALID_TYPES = [:string, :integer, :float, :time, :boolean, :array, :hash]
 
   SEPARATOR = ";|;"
 
@@ -14,17 +14,19 @@ module HstoreAccessor
   DEFAULT_DESERIALIZER = ->(value) { value.to_s }
 
   SERIALIZERS = {
-    :array => ->(value) { value.join(SEPARATOR) },
-    :hash => ->(value) { value.to_json },
-    :time => ->(value) { value.to_i }
+    :array    => -> value { (value && value.join(SEPARATOR)) || "" },
+    :hash     => -> value { (value && value.to_json) || {} },
+    :time     => -> value { value.to_i },
+    :boolean  => -> value { (value == true).to_s }
   }
 
   DESERIALIZERS = {
-    :array => ->(value) { value.split(SEPARATOR) },
-    :hash => ->(value) { JSON.parse(value) },
-    :integer => ->(value) { value.to_i },
-    :float => ->(value) { value.to_f },
-    :time => ->(value) { Time.at(value.to_i) }
+    :array    => -> value { (value && value.split(SEPARATOR)) || [] },
+    :hash     => -> value { JSON.parse(value) },
+    :integer  => -> value { value.to_i },
+    :float    => -> value { value.to_f },
+    :time     => -> value { Time.at(value.to_i) },
+    :boolean  => -> value { value == "true" }
   }
 
   def self.included(base)
@@ -59,23 +61,28 @@ module HstoreAccessor
           deserialize(type, value)
         end
 
+        query_field = "#{hstore_attribute} -> '#{key}'"
+
         case type
         when :string
-          send(:scope, "with_#{key}", -> value { where("#{hstore_attribute} -> '#{key}' = ?", value.to_s) })
+          send(:scope, "with_#{key}", -> value { where("#{query_field} = ?", value.to_s) })
         when :integer, :float
-          send(:scope, "#{key}_lt",  -> value { where("#{hstore_attribute} -> '#{key}' < ?", value.to_s) })
-          send(:scope, "#{key}_lte", -> value { where("#{hstore_attribute} -> '#{key}' <= ?", value.to_s) })
-          send(:scope, "#{key}_eq",  -> value { where("#{hstore_attribute} -> '#{key}' = ?", value.to_s) })
-          send(:scope, "#{key}_gte", -> value { where("#{hstore_attribute} -> '#{key}' >= ?", value.to_s) })
-          send(:scope, "#{key}_gt",  -> value { where("#{hstore_attribute} -> '#{key}' > ?", value.to_s) })
+          send(:scope, "#{key}_lt",  -> value { where("(#{query_field})::#{type} < ?", value.to_s) })
+          send(:scope, "#{key}_lte", -> value { where("(#{query_field})::#{type} <= ?", value.to_s) })
+          send(:scope, "#{key}_eq",  -> value { where("(#{query_field})::#{type} = ?", value.to_s) })
+          send(:scope, "#{key}_gte", -> value { where("(#{query_field})::#{type} >= ?", value.to_s) })
+          send(:scope, "#{key}_gt",  -> value { where("(#{query_field})::#{type} > ?", value.to_s) })
         when :time
-          send(:scope, "#{key}_before", -> value { where("to_number(#{hstore_attribute} -> '#{key}', '99999999999') < ?", value.to_i) })
-          send(:scope, "#{key}_eq",     -> value { where("to_number(#{hstore_attribute} -> '#{key}', '99999999999') = ?", value.to_i) })
-          send(:scope, "#{key}_after",  -> value { where("to_number(#{hstore_attribute} -> '#{key}', '99999999999') > ?", value.to_i) })
+          send(:scope, "#{key}_before", -> value { where("(#{query_field})::integer < ?", value.to_i) })
+          send(:scope, "#{key}_eq",     -> value { where("(#{query_field})::integer = ?", value.to_i) })
+          send(:scope, "#{key}_after",  -> value { where("(#{query_field})::integer > ?", value.to_i) })
+        when :boolean
+          send(:scope, "is_#{key}", -> { where("#{query_field} = 'true'") })
+          send(:scope, "not_#{key}", -> { where("#{query_field} = 'false'") })
         when :array
-          send(:scope, "#{key}_eq",        -> value { where("#{hstore_attribute} -> '#{key}' = ?", value.join(SEPARATOR)) })
+          send(:scope, "#{key}_eq",        -> value { where("#{query_field} = ?", value.join(SEPARATOR)) })
           send(:scope, "#{key}_contains",  -> value do
-            where("string_to_array(#{hstore_attribute} -> '#{key}', '#{SEPARATOR}') @> string_to_array(?, '#{SEPARATOR}')", Array[value].flatten)
+            where("string_to_array(#{query_field}, '#{SEPARATOR}') @> string_to_array(?, '#{SEPARATOR}')", Array[value].flatten)
           end)
         end
       end

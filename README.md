@@ -27,7 +27,7 @@ Or install it yourself as:
 The `hstore_accessor` method accepts the name of the hstore column you'd
 like to use and a hash with keys representing fields and values
 indicating the type to be stored in that field.  The available types
-are: `string`, `integer`, `float`, `time`, `array`, and `hash`.
+are: `string`, `integer`, `float`, `time`, `boolean`, `array`, and `hash`.
 
 ```ruby
 class Product < ActiveRecord::Base
@@ -51,6 +51,7 @@ p.color = "green"
 p.weight = 34
 p.price = 99.95
 p.built_at = Time.now - 10.days
+p.popular = true
 p.tags = ["housewares", "kitchen"]
 p.ratings = { user_a: 3, user_b: 4 }
 ```
@@ -58,14 +59,14 @@ p.ratings = { user_a: 3, user_b: 4 }
 Reading these fields works as well.
 
 ```ruby
-p.color #=> "green
+p.color #=> "green"
 p.tags #=> ["housewares", "kitchen"] 
 ```
 
 ### Scopes
 
 The `hstore_accessor` macro also creates scopes for `string`, `integer`,
-`float`, `time`, and `array` fields.
+`float`, `time`, `boolean`, and `array` fields.
 
 #### String Fields
 
@@ -106,6 +107,15 @@ For `array` types, two scopes are created:
 Product.tags_eq(["housewares", "kitchen"])        # tags equaling
 Product.tags_contains("kitchen")                  # tags containing a single value
 Product.tags_contains(["housewares", "kitchen"])  # tags containing a number of values
+```
+
+#### Boolean Fields
+
+Two scopes are created for `boolean` fields:
+
+```ruby
+Product.is_popular    # => when populer is set to true
+Product.not_popular   # => when populer is set to false
 ```
 
 ### Single-table Inheritance
@@ -164,6 +174,7 @@ individual fields in an `hstore` column.
 
 This approach was originally concieved by Joe Hirn in [this blog
 post](http://www.devmynd.com/blog/2013-3-single-table-inheritance-hstore-lovely-combination).
+
 
 ## Contributing
 
