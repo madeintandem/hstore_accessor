@@ -11,7 +11,7 @@ module HstoreAccessor
   SEPARATOR = "||;||"
 
   DEFAULT_SERIALIZER = ->(value) { value.to_s }
-  DEFAULT_DESERIALIZER = ->(value) { value.to_s }
+  DEFAULT_DESERIALIZER = DEFAULT_SERIALIZER
 
   SERIALIZERS = {
     :array    => -> value { (value && value.join(SEPARATOR)) || "" },
