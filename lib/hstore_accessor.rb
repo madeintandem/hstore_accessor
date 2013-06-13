@@ -8,7 +8,7 @@ module HstoreAccessor
 
   VALID_TYPES = [:string, :integer, :float, :time, :boolean, :array, :hash]
 
-  SEPARATOR = ";|;"
+  SEPARATOR = "||;||"
 
   DEFAULT_SERIALIZER = ->(value) { value.to_s }
   DEFAULT_DESERIALIZER = ->(value) { value.to_s }
