@@ -3,6 +3,7 @@ require "active_support"
 require "active_record"
 
 module HstoreAccessor
+  extend ActiveSupport::Concern
 
   InvalidDataTypeError = Class.new(StandardError)
 
@@ -28,10 +29,6 @@ module HstoreAccessor
     :time     => -> value { Time.at(value.to_i) },
     :boolean  => -> value { value == "true" }
   }
-
-  def self.included(base)
-    base.extend(ClassMethods)
-  end
 
   def serialize(type, value, serializer=nil)
     serializer ||= (SERIALIZERS[type] || DEFAULT_SERIALIZER)
