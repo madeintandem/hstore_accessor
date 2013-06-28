@@ -6,7 +6,7 @@ ActiveRecord::Base.establish_connection(
   username: "root"
 )
 
-ActiveRecord::Base.connection.execute("CREATE EXTENSION hstore;") rescue PG::Error
+ActiveRecord::Base.connection.execute("CREATE EXTENSION hstore;") rescue ActiveRecord::StatementInvalid
 ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS products;")
 
 ActiveRecord::Base.connection.create_table(:products) do |t|
