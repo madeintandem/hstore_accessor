@@ -201,27 +201,11 @@ describe HstoreAccessor do
       expect(product.tags).to eq ["household", "living room", "kitchen"]
     end
 
-    xit "returns an empty array if an array value is not set" do
-      expect(Product.new.tags).to eq []
-      product.tags = nil
-      product.save
-      product.reload
-      expect(product.tags).to eq []
-    end
-
     it "correctly stores hash values" do
       product.reviews = { "user_123" => "4 stars", "user_994" => "3 stars" }
       product.save
       product.reload
       expect(product.reviews).to eq({ "user_123" => "4 stars", "user_994" => "3 stars" })
-    end
-
-    xit "returns an empty hash if a hash value is not set" do
-      expect(Product.new.reviews).to eq({})
-      product.reviews = nil
-      product.save
-      product.reload
-      expect(product.reviews).to eq({})
     end
 
     it "correctly stores time values" do
