@@ -31,11 +31,13 @@ module HstoreAccessor
   }
 
   def serialize(type, value, serializer=nil)
+    return nil if value.nil?
     serializer ||= (SERIALIZERS[type] || DEFAULT_SERIALIZER)
     serializer.call(value)
   end
 
   def deserialize(type, value, deserializer=nil)
+    return nil if value.nil?
     deserializer ||= (DESERIALIZERS[type] || DEFAULT_DESERIALIZER)
     deserializer.call(value)
   end

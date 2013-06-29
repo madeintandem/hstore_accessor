@@ -1,15 +1,18 @@
 require "spec_helper"
 require "active_support/all"
 
+FIELDS = {
+  color: :string,
+  price: :integer,
+  weight: :float,
+  popular: :boolean,
+  build_timestamp: :time,
+  tags: :array,
+  reviews: :hash
+}
+
 class Product < ActiveRecord::Base
-  hstore_accessor :options,
-    color: :string,
-    price: :integer,
-    weight: :float,
-    popular: :boolean,
-    build_timestamp: :time,
-    tags: :array,
-    reviews: :hash
+  hstore_accessor :options, FIELDS
 end
 
 describe HstoreAccessor do
@@ -18,14 +21,14 @@ describe HstoreAccessor do
 
     let(:product) { Product.new }
 
-    it "creates getters for the hstore fields" do
-      [:color, :price, :weight, :tags, :reviews].each do |field|
+    FIELDS.keys.each do |field|
+      it "creates a getter for the hstore field: #{field}" do
         expect(product).to respond_to(field)
       end
     end
 
-    it "creates setters for the hstore fields" do
-      [:color, :price, :weight, :tags, :reviews].each do |field|
+    FIELDS.keys.each do |field|
+      it "creates a setter for the hstore field: #{field}=" do
         expect(product).to respond_to(:"#{field}=")
       end
     end
@@ -41,6 +44,25 @@ describe HstoreAccessor do
 
   end
 
+  context "nil values" do
+    let!(:timestamp) { Time.now }
+    let!(:product)   { Product.new }
+    let!(:product_a) { Product.create(color: "green",  price: 10, weight: 10.1, tags: ["tag1", "tag2", "tag3"], popular: true,  build_timestamp: (timestamp - 10.days)) }
+
+    FIELDS.keys.each do |field|
+      it "reponds with nil when #{field} is not set" do
+        expect(product.send(field)).to be_nil
+      end
+    end
+
+    FIELDS.keys.each do |field|
+      it "reponds with nil when #{field} is set back to nil after being set initially" do
+        product_a.send("#{field}=", nil)
+        expect(product_a.send(field)).to be_nil
+      end
+    end
+
+  end
   describe "scopes" do
 
     let!(:timestamp) { Time.now }
@@ -179,27 +201,11 @@ describe HstoreAccessor do
       expect(product.tags).to eq ["household", "living room", "kitchen"]
     end
 
-    it "returns an empty array if an array value is not set" do
-      expect(Product.new.tags).to eq []
-      product.tags = nil
-      product.save
-      product.reload
-      expect(product.tags).to eq []
-    end
-
     it "correctly stores hash values" do
       product.reviews = { "user_123" => "4 stars", "user_994" => "3 stars" }
       product.save
       product.reload
       expect(product.reviews).to eq({ "user_123" => "4 stars", "user_994" => "3 stars" })
-    end
-
-    it "returns an empty hash if a hash value is not set" do
-      expect(Product.new.reviews).to eq({})
-      product.reviews = nil
-      product.save
-      product.reload
-      expect(product.reviews).to eq({})
     end
 
     it "correctly stores time values" do
