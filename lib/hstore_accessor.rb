@@ -43,7 +43,6 @@ module HstoreAccessor
   module ClassMethods
 
     def hstore_accessor(hstore_attribute, fields)
-
       fields.each do |key, type|
 
         raise InvalidDataTypeError unless VALID_TYPES.include?(type)
@@ -54,7 +53,7 @@ module HstoreAccessor
         end
 
         define_method(key) do
-          value = send(hstore_attribute) && send(hstore_attribute)[key.to_s]
+          value = send(hstore_attribute) && send(hstore_attribute).with_indifferent_access[key.to_s]
           deserialize(type, value)
         end
 

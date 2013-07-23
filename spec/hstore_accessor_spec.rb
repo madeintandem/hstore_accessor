@@ -158,6 +158,24 @@ describe HstoreAccessor do
       expect(product.color).to eq "blue"
     end
 
+    it "allows access to bulk set values via string before saving" do
+      product.options = {
+        "color" => "blue",
+        "price" => 120
+      }
+      expect(product.color).to eq "blue"
+      expect(product.price).to eq 120
+    end
+
+    it "allows access to bulk set values via :symbols before saving" do
+      product.options = {
+        color: "blue",
+        price: 120
+      }
+      expect(product.color).to eq "blue"
+      expect(product.price).to eq 120
+    end
+
     it "correctly stores integer values" do
       product.price = 468
       product.save
