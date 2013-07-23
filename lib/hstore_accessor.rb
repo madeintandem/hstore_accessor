@@ -15,15 +15,15 @@ module HstoreAccessor
   DEFAULT_DESERIALIZER = DEFAULT_SERIALIZER
 
   SERIALIZERS = {
-    :array    => -> value { (value && value.join(SEPARATOR)) || "" },
-    :hash     => -> value { (value && value.to_json) || {} },
+    :array    => -> value { (value && value.join(SEPARATOR)) || nil },
+    :hash     => -> value { (value && value.to_json) || nil },
     :time     => -> value { value.to_i },
     :boolean  => -> value { (value == true).to_s }
   }
 
   DESERIALIZERS = {
-    :array    => -> value { (value && value.split(SEPARATOR)) || [] },
-    :hash     => -> value { (value && JSON.parse(value)) || {} },
+    :array    => -> value { (value && value.split(SEPARATOR)) || nil },
+    :hash     => -> value { (value && JSON.parse(value)) || nil },
     :integer  => -> value { value.to_i },
     :float    => -> value { value.to_f },
     :time     => -> value { Time.at(value.to_i) },
