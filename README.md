@@ -63,6 +63,19 @@ p.color #=> "green"
 p.tags #=> ["housewares", "kitchen"] 
 ```
 
+In order to reduce the storage overhead of hstore keys (especially when
+indexed) you can specify an alternate key.
+
+```ruby
+hstore_accessor :options,
+  color: { data_type: :string, store_key: "c" },
+  weight: { data_type: :integer, store_key: "w" }
+```
+
+In the above example you can continue to interact with the fields using
+their full name but when saved to the database the field will be set
+using the `store_key`.
+
 ### Scopes
 
 The `hstore_accessor` macro also creates scopes for `string`, `integer`,
