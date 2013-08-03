@@ -4,7 +4,7 @@ require "active_support/all"
 FIELDS = {
   color: :string,
   price: :integer,
-  weight: :float,
+  weight: { data_type: :float, store_key: "w" },
   popular: :boolean,
   build_timestamp: :time,
   tags: :array,
@@ -40,6 +40,14 @@ describe HstoreAccessor do
           hstore_accessor :foo, bar: :baz
         end
       end.to raise_error(HstoreAccessor::InvalidDataTypeError)
+    end
+
+    it "stores using the store_key if one is provided" do
+      product.weight = 38.5
+      product.save
+      product.reload
+      expect(product.options["w"]).to eq "38.5"
+      expect(product.weight).to eq 38.5
     end
 
   end

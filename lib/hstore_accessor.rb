@@ -47,29 +47,37 @@ module HstoreAccessor
     def hstore_accessor(hstore_attribute, fields)
       fields.each do |key, type|
 
-        raise InvalidDataTypeError unless VALID_TYPES.include?(type)
+        data_type = type
+        store_key = key
+        if type.is_a?(Hash)
+          type = type.with_indifferent_access
+          data_type = type[:data_type]
+          store_key = type[:store_key]
+        end
+
+        raise InvalidDataTypeError unless VALID_TYPES.include?(data_type)
 
         define_method("#{key}=") do |value|
-          send("#{hstore_attribute}=", (send(hstore_attribute) || {}).merge(key.to_s => serialize(type, value)))
+          send("#{hstore_attribute}=", (send(hstore_attribute) || {}).merge(store_key.to_s => serialize(data_type, value)))
           send("#{hstore_attribute}_will_change!")
         end
 
         define_method(key) do
-          value = send(hstore_attribute) && send(hstore_attribute).with_indifferent_access[key.to_s]
-          deserialize(type, value)
+          value = send(hstore_attribute) && send(hstore_attribute).with_indifferent_access[store_key.to_s]
+          deserialize(data_type, value)
         end
 
-        query_field = "#{hstore_attribute} -> '#{key}'"
+        query_field = "#{hstore_attribute} -> '#{store_key}'"
 
-        case type
+        case data_type
         when :string
           send(:scope, "with_#{key}", -> value { where("#{query_field} = ?", value.to_s) })
         when :integer, :float
-          send(:scope, "#{key}_lt",  -> value { where("(#{query_field})::#{type} < ?", value.to_s) })
-          send(:scope, "#{key}_lte", -> value { where("(#{query_field})::#{type} <= ?", value.to_s) })
-          send(:scope, "#{key}_eq",  -> value { where("(#{query_field})::#{type} = ?", value.to_s) })
-          send(:scope, "#{key}_gte", -> value { where("(#{query_field})::#{type} >= ?", value.to_s) })
-          send(:scope, "#{key}_gt",  -> value { where("(#{query_field})::#{type} > ?", value.to_s) })
+          send(:scope, "#{key}_lt",  -> value { where("(#{query_field})::#{data_type} < ?", value.to_s) })
+          send(:scope, "#{key}_lte", -> value { where("(#{query_field})::#{data_type} <= ?", value.to_s) })
+          send(:scope, "#{key}_eq",  -> value { where("(#{query_field})::#{data_type} = ?", value.to_s) })
+          send(:scope, "#{key}_gte", -> value { where("(#{query_field})::#{data_type} >= ?", value.to_s) })
+          send(:scope, "#{key}_gt",  -> value { where("(#{query_field})::#{data_type} > ?", value.to_s) })
         when :time
           send(:scope, "#{key}_before", -> value { where("(#{query_field})::integer < ?", value.to_i) })
           send(:scope, "#{key}_eq",     -> value { where("(#{query_field})::integer = ?", value.to_i) })
