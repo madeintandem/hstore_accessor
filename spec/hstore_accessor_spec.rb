@@ -8,7 +8,8 @@ FIELDS = {
   popular: :boolean,
   build_timestamp: :time,
   tags: :array,
-  reviews: :hash
+  reviews: :hash,
+  released_at: :date
 }
 
 class Product < ActiveRecord::Base
@@ -54,8 +55,9 @@ describe HstoreAccessor do
 
   context "nil values" do
     let!(:timestamp) { Time.now }
+    let!(:datestamp) { Date.today }
     let!(:product)   { Product.new }
-    let!(:product_a) { Product.create(color: "green",  price: 10, weight: 10.1, tags: ["tag1", "tag2", "tag3"], popular: true,  build_timestamp: (timestamp - 10.days)) }
+    let!(:product_a) { Product.create(color: "green",  price: 10, weight: 10.1, tags: ["tag1", "tag2", "tag3"], popular: true,  build_timestamp: (timestamp - 10.days), released_at: (datestamp - 8.days)) }
 
     FIELDS.keys.each do |field|
       it "reponds with nil when #{field} is not set" do
@@ -74,9 +76,10 @@ describe HstoreAccessor do
   describe "scopes" do
 
     let!(:timestamp) { Time.now }
-    let!(:product_a) { Product.create(color: "green",  price: 10, weight: 10.1, tags: ["tag1", "tag2", "tag3"], popular: true,  build_timestamp: (timestamp - 10.days)) }
-    let!(:product_b) { Product.create(color: "orange", price: 20, weight: 20.2, tags: ["tag2", "tag3", "tag4"], popular: false, build_timestamp: (timestamp - 5.days)) }
-    let!(:product_c) { Product.create(color: "blue",   price: 30, weight: 30.3, tags: ["tag3", "tag4", "tag5"], popular: true,  build_timestamp: timestamp) }
+    let!(:datestamp) { Date.today }
+    let!(:product_a) { Product.create(color: "green",  price: 10, weight: 10.1, tags: ["tag1", "tag2", "tag3"], popular: true,  build_timestamp: (timestamp - 10.days), released_at: (datestamp - 8.days)) }
+    let!(:product_b) { Product.create(color: "orange", price: 20, weight: 20.2, tags: ["tag2", "tag3", "tag4"], popular: false, build_timestamp: (timestamp - 5.days), released_at: (datestamp - 4.days)) }
+    let!(:product_c) { Product.create(color: "blue",   price: 30, weight: 30.3, tags: ["tag3", "tag4", "tag5"], popular: true,  build_timestamp: timestamp, released_at: datestamp) }
 
     context "for string fields support" do
 
@@ -163,6 +166,22 @@ describe HstoreAccessor do
 
     end
 
+    context "for date fields support" do
+
+      it "before" do
+        expect(Product.released_at_before(datestamp)).to eq [product_a, product_b]
+      end
+
+      it "equality" do
+        expect(Product.released_at_eq(datestamp)).to eq [product_c]
+      end
+
+      it "after" do
+        expect(Product.released_at_after(datestamp - 6.days)).to eq [product_b, product_c]
+      end
+
+    end
+
     context "for boolean field support" do
 
       it "true" do
@@ -240,6 +259,15 @@ describe HstoreAccessor do
       product.save
       product.reload
       expect(product.build_timestamp.to_i).to eq timestamp.to_i
+    end
+
+    it "correctly stores date values" do
+      datestamp = Date.today - 9.days
+      product.released_at = datestamp
+      product.save
+      product.reload
+      expect(product.released_at.to_s).to eq datestamp.to_s
+      expect(product.released_at).to eq datestamp
     end
 
     it "setters call the _will_change! method of the store attribute" do

@@ -7,7 +7,7 @@ module HstoreAccessor
 
   InvalidDataTypeError = Class.new(StandardError)
 
-  VALID_TYPES = [:string, :integer, :float, :time, :boolean, :array, :hash]
+  VALID_TYPES = [:string, :integer, :float, :time, :boolean, :array, :hash, :date]
 
   SEPARATOR = "||;||"
 
@@ -18,7 +18,8 @@ module HstoreAccessor
     :array    => -> value { (value && value.join(SEPARATOR)) || nil },
     :hash     => -> value { (value && value.to_json) || nil },
     :time     => -> value { value.to_i },
-    :boolean  => -> value { (value == true).to_s }
+    :boolean  => -> value { (value == true).to_s },
+    :date     => -> value { (value && value.to_s) || nil }
   }
 
   DESERIALIZERS = {
@@ -27,7 +28,8 @@ module HstoreAccessor
     :integer  => -> value { value.to_i },
     :float    => -> value { value.to_f },
     :time     => -> value { Time.at(value.to_i) },
-    :boolean  => -> value { value == "true" }
+    :boolean  => -> value { value == "true" },
+    :date     => -> value { (value && Date.parse(value)) || nil }
   }
 
   def serialize(type, value, serializer=nil)
@@ -82,6 +84,10 @@ module HstoreAccessor
           send(:scope, "#{key}_before", -> value { where("(#{query_field})::integer < ?", value.to_i) })
           send(:scope, "#{key}_eq",     -> value { where("(#{query_field})::integer = ?", value.to_i) })
           send(:scope, "#{key}_after",  -> value { where("(#{query_field})::integer > ?", value.to_i) })
+        when :date
+          send(:scope, "#{key}_before", -> value { where("#{query_field} < ?", value.to_s) })
+          send(:scope, "#{key}_eq",     -> value { where("#{query_field} = ?", value.to_s) })
+          send(:scope, "#{key}_after",  -> value { where("#{query_field} > ?", value.to_s) })
         when :boolean
           send(:scope, "is_#{key}", -> { where("#{query_field} = 'true'") })
           send(:scope, "not_#{key}", -> { where("#{query_field} = 'false'") })
