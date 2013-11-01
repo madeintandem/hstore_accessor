@@ -1,4 +1,5 @@
 require "hstore_accessor"
+require "database_cleaner"
 
 ActiveRecord::Base.establish_connection(
   adapter: "postgresql",
@@ -13,10 +14,12 @@ ActiveRecord::Base.connection.create_table(:products) do |t|
   t.hstore :options
 end
 
+DatabaseCleaner.strategy = :truncation
+
 RSpec.configure do |config|
   config.mock_with :rspec
 
-  config.after do
-    Product.delete_all
+  config.before do
+    DatabaseCleaner.clean
   end
 end

@@ -54,6 +54,7 @@ describe HstoreAccessor do
   end
 
   context "nil values" do
+
     let!(:timestamp) { Time.now }
     let!(:datestamp) { Date.today }
     let!(:product)   { Product.new }
@@ -73,6 +74,27 @@ describe HstoreAccessor do
     end
 
   end
+
+  describe "predicate methods" do
+
+    let!(:product) { Product.new }
+
+    it "return the state for true boolean fields" do
+      product.popular = true
+      product.save
+      product.reload
+      expect(product.popular?).to be_true
+    end
+
+    it "return the state for false boolean fields" do
+      product.popular = false
+      product.save
+      product.reload
+      expect(product.popular?).to be_false
+    end
+
+  end
+
   describe "scopes" do
 
     let!(:timestamp) { Time.now }
@@ -270,11 +292,22 @@ describe HstoreAccessor do
       expect(product.released_at).to eq datestamp
     end
 
-    it "correctly stores boolean values when string 'true' is passed" do
-      product.popular = 'true'
-      product.save
-      product.reload
-      expect(product.popular).to be(true)
+    context "correctly stores boolean values" do
+
+      it "when string 'true' is passed" do
+        product.popular = 'true'
+        product.save
+        product.reload
+        expect(product.popular).to be_true
+      end
+
+      it "when a real boolean is passed" do
+        product.popular = true
+        product.save
+        product.reload
+        expect(product.popular).to be_true
+      end
+
     end
 
     it "setters call the _will_change! method of the store attribute" do

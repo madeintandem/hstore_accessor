@@ -18,7 +18,7 @@ module HstoreAccessor
     :array    => -> value { (value && value.join(SEPARATOR)) || nil },
     :hash     => -> value { (value && value.to_json) || nil },
     :time     => -> value { value.to_i },
-    :boolean  => -> value { (value.to_s == 'true').to_s },
+    :boolean  => -> value { (value.to_s == "true").to_s },
     :date     => -> value { (value && value.to_s) || nil }
   }
 
@@ -57,6 +57,8 @@ module HstoreAccessor
           store_key = type[:store_key]
         end
 
+        data_type = data_type.to_sym
+
         raise InvalidDataTypeError unless VALID_TYPES.include?(data_type)
 
         define_method("#{key}=") do |value|
@@ -67,6 +69,12 @@ module HstoreAccessor
         define_method(key) do
           value = send(hstore_attribute) && send(hstore_attribute).with_indifferent_access[store_key.to_s]
           deserialize(data_type, value)
+        end
+
+        if type == :boolean
+          define_method("#{key}?") do
+            return send("#{key}")
+          end
         end
 
         query_field = "#{hstore_attribute} -> '#{store_key}'"
