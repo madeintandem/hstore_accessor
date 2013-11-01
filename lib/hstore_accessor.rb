@@ -18,7 +18,7 @@ module HstoreAccessor
     :array    => -> value { (value && value.join(SEPARATOR)) || nil },
     :hash     => -> value { (value && value.to_json) || nil },
     :time     => -> value { value.to_i },
-    :boolean  => -> value { (value == true).to_s },
+    :boolean  => -> value { (value.to_s == 'true').to_s },
     :date     => -> value { (value && value.to_s) || nil }
   }
 

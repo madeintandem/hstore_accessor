@@ -270,6 +270,13 @@ describe HstoreAccessor do
       expect(product.released_at).to eq datestamp
     end
 
+    it "correctly stores boolean values when string 'true' is passed" do
+      product.popular = 'true'
+      product.save
+      product.reload
+      expect(product.popular).to be(true)
+    end
+
     it "setters call the _will_change! method of the store attribute" do
       product.should_receive(:options_will_change!)
       product.color = "green"
