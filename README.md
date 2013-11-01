@@ -131,6 +131,13 @@ Product.is_popular    # => when populer is set to true
 Product.not_popular   # => when populer is set to false
 ```
 
+Predicate methods are also available on instances:
+
+```ruby
+product = Product.new(popular: true)
+product.popular?  #=> true
+```
+
 ### Single-table Inheritance
 
 One of the big issues with `ActiveRecord` single-table inheritance (STI)
