@@ -53,6 +53,16 @@ describe HstoreAccessor do
 
   end
 
+  context "#__hstore_metadata_for_*" do
+
+    let(:product) { Product.new }
+
+    it "returns the metadata hash for the specified field" do
+      expect(product.hstore_metadata_for_options).to eq FIELDS
+    end
+
+  end
+
   context "nil values" do
 
     let!(:timestamp) { Time.now }

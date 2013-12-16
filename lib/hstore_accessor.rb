@@ -61,6 +61,10 @@ module HstoreAccessor
 
         raise InvalidDataTypeError unless VALID_TYPES.include?(data_type)
 
+        define_method("hstore_metadata_for_#{hstore_attribute}") do
+          fields
+        end
+
         define_method("#{key}=") do |value|
           send("#{hstore_attribute}=", (send(hstore_attribute) || {}).merge(store_key.to_s => serialize(data_type, value)))
           send("#{hstore_attribute}_will_change!")
