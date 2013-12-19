@@ -44,6 +44,44 @@ module HstoreAccessor
     deserializer.call(value)
   end
 
+  def type_cast(type, value)
+    return nil if value.nil?
+    column_class = ActiveRecord::ConnectionAdapters::Column
+    case type
+    when :string,:hash,:array  then value
+    when :integer              then column_class.value_to_integer(value)
+    when :float                then value.to_f
+    when :time                 then string_to_time(value)
+    when :date                 then column_class.value_to_date(value)
+    when :boolean              then column_class.value_to_boolean(value)
+    else value
+    end
+  end
+
+  # There is a bug in ActiveRecord::ConnectionAdapters::Column#string_to_time 
+  # which drops the timezone. This has been fixed, but not released.
+  # This method includes the fix. See: https://github.com/rails/rails/pull/12290
+  def string_to_time string
+    return string unless string.is_a?(String)
+    return nil if string.empty?
+
+    time_hash = Date._parse(string)
+    time_hash[:sec_fraction] = ActiveRecord::ConnectionAdapters::Column.send(:microseconds, time_hash)
+    (year, mon, mday, hour, min, sec, microsec, offset) = *time_hash.values_at(:year, :mon, :mday, :hour, :min, :sec, :sec_fraction, :offset)
+    # Treat 0000-00-00 00:00:00 as nil.
+    return nil if year.nil? || (year == 0 && mon == 0 && mday == 0)
+
+    if offset
+      time = Time.utc(year, mon, mday, hour, min, sec, microsec) rescue nil
+      return nil unless time
+
+      time -= offset
+      ActiveRecord::Base.default_timezone == :utc ? time : time.getlocal
+    else
+      Time.public_send(ActiveRecord::Base.default_timezone, year, mon, mday, hour, min, sec, microsec) rescue nil
+    end
+  end
+
   module ClassMethods
 
     def hstore_accessor(hstore_attribute, fields)
@@ -66,7 +104,7 @@ module HstoreAccessor
         end
 
         define_method("#{key}=") do |value|
-          send("#{hstore_attribute}=", (send(hstore_attribute) || {}).merge(store_key.to_s => serialize(data_type, value)))
+          send("#{hstore_attribute}=", (send(hstore_attribute) || {}).merge(store_key.to_s => serialize(data_type, type_cast(type, value))))
           send("#{hstore_attribute}_will_change!")
         end
 
