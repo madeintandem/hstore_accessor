@@ -325,6 +325,40 @@ describe HstoreAccessor do
       product.color = "green"
     end
 
+    describe "type casting" do
+      it "type casts integer values" do
+        product.price = '468'
+        expect(product.price).to eq 468
+      end
+      it "type casts float values" do
+        product.weight = '93.45'
+        expect(product.weight).to eq 93.45
+      end
+      it "type casts time values" do
+        timestamp = Time.now - 10.days
+        product.build_timestamp = timestamp.to_s
+        expect(product.build_timestamp.to_i).to eq timestamp.to_i
+      end
+      it "type casts date values" do
+        datestamp = Date.today - 9.days
+        product.released_at = datestamp.to_s
+        expect(product.released_at).to eq datestamp
+      end
+
+      it "type casts boolean values" do
+        ActiveRecord::ConnectionAdapters::Column::TRUE_VALUES.each do |value|
+          product.popular = value
+          expect(product.popular).to be_true
+        end
+        ActiveRecord::ConnectionAdapters::Column::FALSE_VALUES.each do |value|
+          product.popular = value
+          expect(product.popular).to be_false
+        end
+      end
+
+
+    end
+
   end
 
 end
