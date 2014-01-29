@@ -1,4 +1,5 @@
 require "hstore_accessor/version"
+require "hstore_accessor/time_helper"
 require "active_support"
 require "active_record"
 
@@ -15,21 +16,21 @@ module HstoreAccessor
   DEFAULT_DESERIALIZER = DEFAULT_SERIALIZER
 
   SERIALIZERS = {
-    :array    => -> value { (value && value.join(SEPARATOR)) || nil },
-    :hash     => -> value { (value && value.to_json) || nil },
-    :time     => -> value { value.to_i },
-    :boolean  => -> value { (value.to_s == "true").to_s },
-    :date     => -> value { (value && value.to_s) || nil }
+    array:    -> value { (value && value.join(SEPARATOR)) || nil },
+    hash:     -> value { (value && value.to_json) || nil },
+    time:     -> value { value.to_i },
+    boolean:  -> value { (value.to_s == "true").to_s },
+    date:     -> value { (value && value.to_s) || nil }
   }
 
   DESERIALIZERS = {
-    :array    => -> value { (value && value.split(SEPARATOR)) || nil },
-    :hash     => -> value { (value && JSON.parse(value)) || nil },
-    :integer  => -> value { value.to_i },
-    :float    => -> value { value.to_f },
-    :time     => -> value { Time.at(value.to_i) },
-    :boolean  => -> value { value == "true" },
-    :date     => -> value { (value && Date.parse(value)) || nil }
+    array:    -> value { (value && value.split(SEPARATOR)) || nil },
+    hash:     -> value { (value && JSON.parse(value)) || nil },
+    integer:  -> value { value.to_i },
+    float:    -> value { value.to_f },
+    time:     -> value { Time.at(value.to_i) },
+    boolean:  -> value { value == "true" },
+    date:     -> value { (value && Date.parse(value)) || nil }
   }
 
   def serialize(type, value, serializer=nil)
@@ -51,34 +52,10 @@ module HstoreAccessor
     when :string,:hash,:array  then value
     when :integer              then column_class.value_to_integer(value)
     when :float                then value.to_f
-    when :time                 then string_to_time(value)
+    when :time                 then TimeHelper.string_to_time(value)
     when :date                 then column_class.value_to_date(value)
     when :boolean              then column_class.value_to_boolean(value)
     else value
-    end
-  end
-
-  # There is a bug in ActiveRecord::ConnectionAdapters::Column#string_to_time 
-  # which drops the timezone. This has been fixed, but not released.
-  # This method includes the fix. See: https://github.com/rails/rails/pull/12290
-  def string_to_time string
-    return string unless string.is_a?(String)
-    return nil if string.empty?
-
-    time_hash = Date._parse(string)
-    time_hash[:sec_fraction] = ActiveRecord::ConnectionAdapters::Column.send(:microseconds, time_hash)
-    (year, mon, mday, hour, min, sec, microsec, offset) = *time_hash.values_at(:year, :mon, :mday, :hour, :min, :sec, :sec_fraction, :offset)
-    # Treat 0000-00-00 00:00:00 as nil.
-    return nil if year.nil? || (year == 0 && mon == 0 && mday == 0)
-
-    if offset
-      time = Time.utc(year, mon, mday, hour, min, sec, microsec) rescue nil
-      return nil unless time
-
-      time -= offset
-      ActiveRecord::Base.default_timezone == :utc ? time : time.getlocal
-    else
-      Time.public_send(ActiveRecord::Base.default_timezone, year, mon, mday, hour, min, sec, microsec) rescue nil
     end
   end
 
