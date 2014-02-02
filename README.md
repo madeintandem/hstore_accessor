@@ -2,7 +2,7 @@
 
 PostgreSQL provides an hstore data type for storing arbitrarily complex
 structures in a column.  ActiveRecord 4.0 supports Hstore but casts all
-valus in the store to a string.  Further, ActiveRecord does not provide
+values in the store to a string.  Further, ActiveRecord does not provide
 discrete fields to access values directly in the hstore column.  The
 HstoreAccessor gem solves both of these issues.
 
