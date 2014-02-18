@@ -6,4 +6,6 @@ rvm:
   - jruby-19mode
   - jruby-head
   - rbx
+before_script:
+  - psql -c "create database hstore_accessor;" -U postgres
 script: "bundle exec rspec spec/"
