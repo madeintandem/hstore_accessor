@@ -3,8 +3,7 @@ require "database_cleaner"
 
 ActiveRecord::Base.establish_connection(
   adapter: "postgresql",
-  database: "hstore_accessor",
-  username: "root"
+  database: "hstore_accessor"
 )
 
 ActiveRecord::Base.connection.execute("CREATE EXTENSION hstore;") rescue ActiveRecord::StatementInvalid
