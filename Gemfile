@@ -2,6 +2,14 @@ source "https://rubygems.org"
 
 gemspec
 
-platform :ruby do
-  gem "pg", ">= 0.14.1"
+group :test do
+
+  platform :ruby do
+    gem "pg", ">= 0.14.1"
+  end
+
+  platform :jruby do
+
+  end
+
 end
