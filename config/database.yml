@@ -1,7 +1,0 @@
-test:
-  adapter: postgresql
-  encoding: unicode
-  database: hstore_accessor
-  pool: 5
-  username: postgres
-  password:
