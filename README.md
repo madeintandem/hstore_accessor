@@ -1,3 +1,5 @@
+![Codeship](https://www.codeship.io/projects/db3ce4f0-c3c8-0130-9c44-167bc618456a/status?branch=master)
+
 # HstoreAccessor
 
 PostgreSQL provides an hstore data type for storing arbitrarily complex

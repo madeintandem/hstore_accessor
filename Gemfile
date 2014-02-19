@@ -8,8 +8,4 @@ group :test do
     gem "pg", ">= 0.14.1"
   end
 
-  platform :jruby do
-
-  end
-
 end
