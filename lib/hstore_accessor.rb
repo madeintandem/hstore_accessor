@@ -2,13 +2,14 @@ require "hstore_accessor/version"
 require "hstore_accessor/time_helper"
 require "active_support"
 require "active_record"
+require "bigdecimal"
 
 module HstoreAccessor
   extend ActiveSupport::Concern
 
   InvalidDataTypeError = Class.new(StandardError)
 
-  VALID_TYPES = [:string, :integer, :float, :time, :boolean, :array, :hash, :date]
+  VALID_TYPES = [:string, :integer, :float, :time, :boolean, :array, :hash, :date, :decimal]
 
   SEPARATOR = "||;||"
 
@@ -30,7 +31,8 @@ module HstoreAccessor
     float:    -> value { value.to_f },
     time:     -> value { Time.at(value.to_i) },
     boolean:  -> value { value == "true" },
-    date:     -> value { (value && Date.parse(value)) || nil }
+    date:     -> value { (value && Date.parse(value)) || nil },
+    decimal:  -> value { BigDecimal.new(value) }
   }
 
   def serialize(type, value, serializer=nil)
@@ -49,7 +51,8 @@ module HstoreAccessor
     return nil if value.nil?
     column_class = ActiveRecord::ConnectionAdapters::Column
     case type
-    when :string,:hash,:array  then value
+    when :string,:hash,:array,
+      :decimal                 then value
     when :integer              then column_class.value_to_integer(value)
     when :float                then value.to_f
     when :time                 then TimeHelper.string_to_time(value)
@@ -101,7 +104,7 @@ module HstoreAccessor
         case data_type
         when :string
           send(:scope, "with_#{key}", -> value { where("#{query_field} = ?", value.to_s) })
-        when :integer, :float
+        when :integer, :float, :decimal
           send(:scope, "#{key}_lt",  -> value { where("(#{query_field})::#{data_type} < ?", value.to_s) })
           send(:scope, "#{key}_lte", -> value { where("(#{query_field})::#{data_type} <= ?", value.to_s) })
           send(:scope, "#{key}_eq",  -> value { where("(#{query_field})::#{data_type} = ?", value.to_s) })
