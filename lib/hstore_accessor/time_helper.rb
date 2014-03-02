@@ -1,7 +1,7 @@
 module HstoreAccessor
   module TimeHelper
 
-    # There is a bug in ActiveRecord::ConnectionAdapters::Column#string_to_time 
+    # There is a bug in ActiveRecord::ConnectionAdapters::Column#string_to_time
     # which drops the timezone. This has been fixed, but not released.
     # This method includes the fix. See: https://github.com/rails/rails/pull/12290
 
