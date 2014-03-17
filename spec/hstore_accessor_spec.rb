@@ -104,6 +104,26 @@ describe HstoreAccessor do
       expect(product.popular?).to be_false
     end
 
+    it "return true for boolean field set via hash using real boolean" do
+      product.options = { 'popular' => true }
+      expect(product.popular?).to be_true
+    end
+
+    it "return false for boolean field set via hash using real boolean" do
+      product.options = { 'popular' => false }
+      expect(product.popular?).to be_false
+    end
+
+    it "return true for boolean field set via hash using string" do
+      product.options = { 'popular' => 'true' }
+      expect(product.popular?).to be_true
+    end
+
+    it "return false for boolean field set via hash using string" do
+      product.options = { 'popular' => 'false' }
+      expect(product.popular?).to be_false
+    end
+
   end
 
   describe "scopes" do

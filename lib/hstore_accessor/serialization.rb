@@ -24,7 +24,7 @@ module HstoreAccessor
       integer:  -> value { value.to_i },
       float:    -> value { value.to_f },
       time:     -> value { Time.at(value.to_i) },
-      boolean:  -> value { value == "true" },
+      boolean:  -> value { ActiveRecord::ConnectionAdapters::Column::TRUE_VALUES.include?(value) },
       date:     -> value { (value && Date.parse(value)) || nil },
       decimal:  -> value { BigDecimal.new(value) }
     }
