@@ -32,10 +32,8 @@ module HstoreAccessor
             deserialize(data_type, value)
           end
 
-          if type == :boolean
-            define_method("#{key}?") do
-              return send("#{key}")
-            end
+          define_method("#{key}?") do
+            send("#{key}").present?
           end
 
           query_field = "#{hstore_attribute} -> '#{store_key}'"
