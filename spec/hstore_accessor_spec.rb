@@ -90,38 +90,54 @@ describe HstoreAccessor do
 
     let!(:product) { Product.new }
 
-    it "return the state for true boolean fields" do
-      product.popular = true
-      product.save
-      product.reload
-      expect(product.popular?).to be_true
+    it "exist for each field" do
+      FIELDS.keys.each do |field|
+        expect(product).to respond_to "#{field}?"
+      end
     end
 
-    it "return the state for false boolean fields" do
-      product.popular = false
-      product.save
-      product.reload
-      expect(product.popular?).to be_false
+    it "uses 'present?' to determine return value" do
+      stub = double(present?: :result_of_present)
+      expect(stub).to receive(:present?)
+      product.stub(color: stub)
+      expect(product.color?).to eq(:result_of_present)
     end
 
-    it "return true for boolean field set via hash using real boolean" do
-      product.options = { "popular" => true }
-      expect(product.popular?).to be_true
-    end
+    context "boolean fields" do
 
-    it "return false for boolean field set via hash using real boolean" do
-      product.options = { "popular" => false }
-      expect(product.popular?).to be_false
-    end
+      it "return the state for true boolean fields" do
+        product.popular = true
+        product.save
+        product.reload
+        expect(product.popular?).to be_true
+      end
 
-    it "return true for boolean field set via hash using string" do
-      product.options = { "popular" => "true" }
-      expect(product.popular?).to be_true
-    end
+      it "return the state for false boolean fields" do
+        product.popular = false
+        product.save
+        product.reload
+        expect(product.popular?).to be_false
+      end
 
-    it "return false for boolean field set via hash using string" do
-      product.options = { "popular" => "false" }
-      expect(product.popular?).to be_false
+      it "return true for boolean field set via hash using real boolean" do
+        product.options = { "popular" => true }
+        expect(product.popular?).to be_true
+      end
+
+      it "return false for boolean field set via hash using real boolean" do
+        product.options = { "popular" => false }
+        expect(product.popular?).to be_false
+      end
+
+      it "return true for boolean field set via hash using string" do
+        product.options = { "popular" => "true" }
+        expect(product.popular?).to be_true
+      end
+
+      it "return false for boolean field set via hash using string" do
+        product.options = { "popular" => "false" }
+        expect(product.popular?).to be_false
+      end
     end
 
   end
