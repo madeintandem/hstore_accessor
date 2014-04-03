@@ -4,6 +4,7 @@ module HstoreAccessor
     module ClassMethods
 
       def hstore_accessor(hstore_attribute, fields)
+        field_methods = Module.new
         fields.each do |key, type|
 
           data_type = type
@@ -22,12 +23,12 @@ module HstoreAccessor
             fields
           end
 
-          define_method("#{key}=") do |value|
+          field_methods.send(:define_method, "#{key}=") do |value|
             send("#{hstore_attribute}=", (send(hstore_attribute) || {}).merge(store_key.to_s => serialize(data_type, TypeHelpers.cast(type, value))))
             send("#{hstore_attribute}_will_change!")
           end
 
-          define_method(key) do
+          field_methods.send(:define_method, key) do
             value = send(hstore_attribute) && send(hstore_attribute).with_indifferent_access[store_key.to_s]
             deserialize(data_type, value)
           end
@@ -66,6 +67,7 @@ module HstoreAccessor
           end
         end
 
+        include field_methods
       end
 
     end
