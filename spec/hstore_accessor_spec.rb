@@ -429,10 +429,45 @@ describe HstoreAccessor do
           expect(product.popular).to be_false
         end
       end
-
-
     end
 
+    context "extended getters and setters" do
+      before do
+        class Product
+          alias_method :set_color, :color=
+          alias_method :get_color, :color
+
+          def color=(value)
+            super(value.upcase)
+          end
+
+          def color
+            super.downcase
+          end
+        end
+      end
+
+      after do
+        class Product
+          alias_method :color=, :set_color
+          alias_method :color, :get_color
+        end
+      end
+
+      context "setters" do
+        it "can be wrapped" do
+          product.color = "red"
+          expect(product.options["color"]).to eq("RED")
+        end
+      end
+
+      context "getters" do
+        it "can be wrapped" do
+          product.color = "GREEN"
+          expect(product.color).to eq("green")
+        end
+      end
+    end
   end
 
 end
