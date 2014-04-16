@@ -4,6 +4,10 @@ module HstoreAccessor
     module ClassMethods
 
       def hstore_accessor(hstore_attribute, fields)
+        define_method("hstore_metadata_for_#{hstore_attribute}") do
+          fields
+        end
+
         field_methods = Module.new
         fields.each do |key, type|
 
@@ -18,10 +22,6 @@ module HstoreAccessor
           data_type = data_type.to_sym
 
           raise Serialization::InvalidDataTypeError unless Serialization::VALID_TYPES.include?(data_type)
-
-          define_method("hstore_metadata_for_#{hstore_attribute}") do
-            fields
-          end
 
           field_methods.send(:define_method, "#{key}=") do |value|
             send("#{hstore_attribute}=", (send(hstore_attribute) || {}).merge(store_key.to_s => serialize(data_type, TypeHelpers.cast(type, value))))
