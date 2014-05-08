@@ -78,6 +78,18 @@ In the above example you can continue to interact with the fields using
 their full name but when saved to the database the field will be set
 using the `store_key`.
 
+Additionally, dirty tracking is implemented in the same way that normal
+`ActiveRecord` fields work.
+
+```ruby
+p.color           #=> "green"
+p.color = "blue"
+p.changed?        #=> true
+p.color_changed?  #=> true
+p.color_was       #=> "green"
+p.color_changes   #=> ["green", "blue"]
+``` 
+
 ### Scopes
 
 The `hstore_accessor` macro also creates scopes for `string`, `integer`,
