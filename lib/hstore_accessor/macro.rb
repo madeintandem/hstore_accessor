@@ -24,8 +24,10 @@ module HstoreAccessor
           raise Serialization::InvalidDataTypeError unless Serialization::VALID_TYPES.include?(data_type)
 
           field_methods.send(:define_method, "#{key}=") do |value|
-            send("#{hstore_attribute}=", (send(hstore_attribute) || {}).merge(store_key.to_s => serialize(data_type, TypeHelpers.cast(type, value))))
+            serialized_value = serialize(data_type, TypeHelpers.cast(type, value))
+            send(:attribute_will_change!, key)
             send("#{hstore_attribute}_will_change!")
+            send("#{hstore_attribute}=", (send(hstore_attribute) || {}).merge(store_key.to_s => serialized_value))
           end
 
           field_methods.send(:define_method, key) do
