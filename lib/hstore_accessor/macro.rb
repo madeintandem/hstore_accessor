@@ -33,8 +33,20 @@ module HstoreAccessor
             deserialize(data_type, value)
           end
 
-          define_method("#{key}?") do
+          field_methods.send(:define_method, "#{key}?") do
             send("#{key}").present?
+          end
+
+          field_methods.send(:define_method, "#{key}_changed?") do
+            send(:attribute_changed?, key)
+          end
+
+          field_methods.send(:define_method, "#{key}_was") do
+            send(:attribute_was, key)
+          end
+
+          field_methods.send(:define_method, "#{key}_change") do
+            send(:attribute_change, key)
           end
 
           query_field = "#{hstore_attribute} -> '#{store_key}'"
