@@ -99,7 +99,7 @@ describe HstoreAccessor do
     it "uses 'present?' to determine return value" do
       stub = double(present?: :result_of_present)
       expect(stub).to receive(:present?)
-      product.stub(color: stub)
+      allow(product).to receive_messages(color: stub)
       expect(product.color?).to eq(:result_of_present)
     end
 
@@ -109,34 +109,34 @@ describe HstoreAccessor do
         product.popular = true
         product.save
         product.reload
-        expect(product.popular?).to be_true
+        expect(product.popular?).to be true
       end
 
       it "return the state for false boolean fields" do
         product.popular = false
         product.save
         product.reload
-        expect(product.popular?).to be_false
+        expect(product.popular?).to be false
       end
 
       it "return true for boolean field set via hash using real boolean" do
         product.options = { "popular" => true }
-        expect(product.popular?).to be_true
+        expect(product.popular?).to be true
       end
 
       it "return false for boolean field set via hash using real boolean" do
         product.options = { "popular" => false }
-        expect(product.popular?).to be_false
+        expect(product.popular?).to be false
       end
 
       it "return true for boolean field set via hash using string" do
         product.options = { "popular" => "true" }
-        expect(product.popular?).to be_true
+        expect(product.popular?).to be true
       end
 
       it "return false for boolean field set via hash using string" do
         product.options = { "popular" => "false" }
-        expect(product.popular?).to be_false
+        expect(product.popular?).to be false
       end
     end
 
@@ -378,20 +378,20 @@ describe HstoreAccessor do
         product.popular = 'true'
         product.save
         product.reload
-        expect(product.popular).to be_true
+        expect(product.popular).to be true
       end
 
       it "when a real boolean is passed" do
         product.popular = true
         product.save
         product.reload
-        expect(product.popular).to be_true
+        expect(product.popular).to be true
       end
 
     end
 
     it "setters call the _will_change! method of the store attribute" do
-      product.should_receive(:options_will_change!)
+      expect(product).to receive(:options_will_change!)
       product.color = "green"
     end
 
@@ -422,11 +422,11 @@ describe HstoreAccessor do
       it "type casts boolean values" do
         ActiveRecord::ConnectionAdapters::Column::TRUE_VALUES.each do |value|
           product.popular = value
-          expect(product.popular).to be_true
+          expect(product.popular).to be true
         end
         ActiveRecord::ConnectionAdapters::Column::FALSE_VALUES.each do |value|
           product.popular = value
-          expect(product.popular).to be_false
+          expect(product.popular).to be false
         end
       end
     end
@@ -475,11 +475,11 @@ describe HstoreAccessor do
     let(:product) { Product.new }
 
     it "<attr>_changed? should return the expected value" do
-      expect(product.color_changed?).to be_false
+      expect(product.color_changed?).to be false
       product.color = "ORANGE"
-      expect(product.color_changed?).to be_true
+      expect(product.color_changed?).to be true
       product.save
-      expect(product.color_changed?).to be_false
+      expect(product.color_changed?).to be false
     end
 
     it "<attr>_was should return the expected value" do
