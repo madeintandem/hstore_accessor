@@ -13,6 +13,8 @@ FIELDS = {
   miles: :decimal
 }
 
+SINGULARS = FIELDS.reject { |k,v| v == :array || v == :hash }.keys
+
 class Product < ActiveRecord::Base
   hstore_accessor :options, FIELDS
 end
@@ -64,24 +66,39 @@ describe HstoreAccessor do
 
   end
 
-  context "nil values" do
+  context "default values" do
+    let!(:timestamp)     { Time.now }
+    let!(:datestamp)     { Date.today }
+    let!(:product)       { Product.new }
+    let!(:product_a)     { Product.create(color: "green",  price: 10, weight: 10.1, tags: ["tag1", "tag2", "tag3"], popular: true,  build_timestamp: (timestamp - 10.days), released_at: (datestamp - 8.days), miles: BigDecimal.new('9.133790001')) }
 
-    let!(:timestamp) { Time.now }
-    let!(:datestamp) { Date.today }
-    let!(:product)   { Product.new }
-    let!(:product_a) { Product.create(color: "green",  price: 10, weight: 10.1, tags: ["tag1", "tag2", "tag3"], popular: true,  build_timestamp: (timestamp - 10.days), released_at: (datestamp - 8.days), miles: BigDecimal.new('9.133790001')) }
+    describe "for singulars" do
 
-    FIELDS.keys.each do |field|
-      it "responds with nil when #{field} is not set" do
-        expect(product.send(field)).to be_nil
+      SINGULARS.each do |field|
+        it "responds with nil when #{field} is not set" do
+          expect(product.send(field)).to be_nil
+        end
       end
+
+      SINGULARS.each do |field|
+        it "responds with nil when #{field} is set back to nil after being set initially" do
+          product_a.send("#{field}=", nil)
+          expect(product_a.send(field)).to be_nil
+        end
+      end
+    
     end
-
-    FIELDS.keys.each do |field|
-      it "responds with nil when #{field} is set back to nil after being set initially" do
-        product_a.send("#{field}=", nil)
-        expect(product_a.send(field)).to be_nil
+    
+    context "for collections" do
+      
+      it "responds with [] for unset array fields" do
+        expect(product.tags).to eq([])
       end
+      
+      it "responds with {} for unset hash fields" do
+        expect(product.reviews).to eq({})
+      end
+      
     end
 
   end
