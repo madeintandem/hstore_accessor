@@ -13,10 +13,13 @@ module HstoreAccessor
 
           data_type = type
           store_key = key
+          default_value = nil
+
           if type.is_a?(Hash)
             type = type.with_indifferent_access
             data_type = type[:data_type]
             store_key = type[:store_key]
+            default_value = type[:default]
           end
 
           data_type = data_type.to_sym
@@ -31,8 +34,16 @@ module HstoreAccessor
           end
 
           field_methods.send(:define_method, key) do
+
             value = send(hstore_attribute) && send(hstore_attribute).with_indifferent_access[store_key.to_s]
-            deserialize(data_type, value)
+            data = deserialize(data_type, value)
+
+            if data.nil? && default_value
+              default_value.call
+            else
+              data
+            end
+
           end
 
           field_methods.send(:define_method, "#{key}?") do
