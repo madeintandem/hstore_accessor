@@ -36,9 +36,20 @@ module HstoreAccessor
     end
 
     def deserialize(type, value, deserializer=nil)
-      return nil if value.nil?
+      return default_value_for(type) if value.nil?
       deserializer ||= (DESERIALIZERS[type] || DEFAULT_DESERIALIZER)
       deserializer.call(value)
+    end
+    
+    def default_value_for(type)
+      case type
+      when :array
+        return []
+      when :hash
+        return {}
+      else
+        return nil
+      end 
     end
 
   end
