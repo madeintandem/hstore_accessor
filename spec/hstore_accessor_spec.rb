@@ -10,8 +10,27 @@ FIELDS = {
   tags: :array,
   reviews: :hash,
   released_at: :date,
-  miles: :decimal
+  miles: :decimal,
+  discount: { data_type: :string, default: -> { 'Not available' } },
+  categories: { data_type: :array, default: -> { [] } }
 }
+
+# returns a list of FIELDS, optionally filtered by those with / without default values
+def fields with_default = nil
+
+  FIELDS.reject do |_, v|
+
+    if with_default.nil?
+      false
+    elsif has_default = v.is_a?(Hash) && v.include?(:default)
+      !with_default
+    else
+      with_default
+    end
+
+  end
+
+end
 
 class Product < ActiveRecord::Base
   hstore_accessor :options, FIELDS
@@ -23,13 +42,13 @@ describe HstoreAccessor do
 
     let(:product) { Product.new }
 
-    FIELDS.keys.each do |field|
+    fields.keys.each do |field|
       it "creates a getter for the hstore field: #{field}" do
         expect(product).to respond_to(field)
       end
     end
 
-    FIELDS.keys.each do |field|
+    fields.keys.each do |field|
       it "creates a setter for the hstore field: #{field}=" do
         expect(product).to respond_to(:"#{field}=")
       end
@@ -59,7 +78,7 @@ describe HstoreAccessor do
     let(:product) { Product.new }
 
     it "returns the metadata hash for the specified field" do
-      expect(product.hstore_metadata_for_options).to eq FIELDS
+      expect(product.hstore_metadata_for_options).to eq fields
     end
 
   end
@@ -69,19 +88,36 @@ describe HstoreAccessor do
     let!(:timestamp) { Time.now }
     let!(:datestamp) { Date.today }
     let!(:product)   { Product.new }
-    let!(:product_a) { Product.create(color: "green",  price: 10, weight: 10.1, tags: ["tag1", "tag2", "tag3"], popular: true,  build_timestamp: (timestamp - 10.days), released_at: (datestamp - 8.days), miles: BigDecimal.new('9.133790001')) }
+    let!(:product_a) { Product.create(color: "green",  price: 10, weight: 10.1, tags: ["tag1", "tag2", "tag3"], popular: true,  build_timestamp: (timestamp - 10.days), released_at: (datestamp - 8.days), miles: BigDecimal.new('9.133790001'), discount: '15%', categories: %w(foo bar)) }
 
-    FIELDS.keys.each do |field|
+    fields(false).keys.each do |field|
       it "responds with nil when #{field} is not set" do
         expect(product.send(field)).to be_nil
       end
     end
 
-    FIELDS.keys.each do |field|
+    fields(false).keys.each do |field|
       it "responds with nil when #{field} is set back to nil after being set initially" do
         product_a.send("#{field}=", nil)
         expect(product_a.send(field)).to be_nil
       end
+    end
+
+    context "and defaults" do
+
+      fields(true).keys.each do |field|
+        it "responds with the default when #{field} is not set" do
+          expect(product.send(field)).to eq(fields[field][:default].call)
+        end
+      end
+
+      fields(true).keys.each do |field|
+        it "responds with the default when #{field} is set back to nil after being set initially" do
+          product_a.send("#{field}=", nil)
+          expect(product_a.send(field)).to eq(fields[field][:default].call)
+        end
+      end
+
     end
 
   end
@@ -91,7 +127,7 @@ describe HstoreAccessor do
     let!(:product) { Product.new }
 
     it "exist for each field" do
-      FIELDS.keys.each do |field|
+      fields.keys.each do |field|
         expect(product).to respond_to "#{field}?"
       end
     end

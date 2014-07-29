@@ -62,7 +62,7 @@ Reading these fields works as well.
 
 ```ruby
 p.color #=> "green"
-p.tags #=> ["housewares", "kitchen"] 
+p.tags #=> ["housewares", "kitchen"]
 ```
 
 In order to reduce the storage overhead of hstore keys (especially when
@@ -88,7 +88,16 @@ p.changed?        #=> true
 p.color_changed?  #=> true
 p.color_was       #=> "green"
 p.color_changes   #=> ["green", "blue"]
-``` 
+```
+
+Default values are available using a `default` option, e.g.
+
+```ruby
+hstore_accessor :options,
+  category: { data_type: :array, default: -> { [] }
+```
+
+The value of a `default` option is always a `Proc`. It is `call`ed when calling the getter and counts as transient, e.g. a field with a `nil` value and a `default` is not `present?`.
 
 ### Scopes
 
