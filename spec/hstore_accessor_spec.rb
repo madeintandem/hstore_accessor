@@ -449,7 +449,7 @@ describe HstoreAccessor do
           end
 
           def color
-            super.downcase
+            super.try(:downcase)
           end
         end
       end
