@@ -4,6 +4,7 @@ require "active_support/all"
 FIELDS = {
   color: :string,
   price: :integer,
+  published: { data_type: :boolean, store_key: "p" },
   weight: { data_type: :float, store_key: "w" },
   popular: :boolean,
   build_timestamp: :time,
@@ -423,10 +424,16 @@ describe HstoreAccessor do
         ActiveRecord::ConnectionAdapters::Column::TRUE_VALUES.each do |value|
           product.popular = value
           expect(product.popular).to be true
+
+          product.published = value
+          expect(product.published).to be true
         end
         ActiveRecord::ConnectionAdapters::Column::FALSE_VALUES.each do |value|
           product.popular = value
           expect(product.popular).to be false
+
+          product.published = value
+          expect(product.published).to be false
         end
       end
     end
