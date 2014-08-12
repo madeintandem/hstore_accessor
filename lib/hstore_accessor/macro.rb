@@ -25,8 +25,10 @@ module HstoreAccessor
 
           field_methods.send(:define_method, "#{key}=") do |value|
             serialized_value = serialize(data_type, TypeHelpers.cast(type, value))
-            send(:attribute_will_change!, key)
-            send("#{hstore_attribute}_will_change!")
+            if (send(hstore_attribute) || {})[store_key.to_s] != serialized_value
+              send(:attribute_will_change!, key)
+              send("#{hstore_attribute}_will_change!")
+            end
             send("#{hstore_attribute}=", (send(hstore_attribute) || {}).merge(store_key.to_s => serialized_value))
           end
 

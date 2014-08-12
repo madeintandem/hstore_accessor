@@ -472,28 +472,54 @@ describe HstoreAccessor do
 
   describe "dirty tracking" do
 
-    let(:product) { Product.new }
+    context "when value is changed" do
 
-    it "<attr>_changed? should return the expected value" do
-      expect(product.color_changed?).to be false
-      product.color = "ORANGE"
-      expect(product.color_changed?).to be true
-      product.save
-      expect(product.color_changed?).to be false
+      let(:product) { Product.new }
+
+      it "<attr>_changed? should return the expected value" do
+        expect(product.color_changed?).to be false
+        product.color = "ORANGE"
+        expect(product.color_changed?).to be true
+        product.save
+        expect(product.color_changed?).to be false
+      end
+
+      it "<attr>_was should return the expected value" do
+        product.color = "ORANGE"
+        product.save
+        product.color = "GREEN"
+        expect(product.color_was).to eq "ORANGE"
+      end
+
+      it "<attr>_change should return the expected value" do
+        product.color = "ORANGE"
+        product.save
+        product.color = "GREEN"
+        expect(product.color_change).to eq ["ORANGE", "GREEN"]
+      end
+
     end
 
-    it "<attr>_was should return the expected value" do
-      product.color = "ORANGE"
-      product.save
-      product.color = "GREEN"
-      expect(product.color_was).to eq "ORANGE"
-    end
+    context 'when value is not changed' do
 
-    it "<attr>_change should return the expected value" do
-      product.color = "ORANGE"
-      product.save
-      product.color = "GREEN"
-      expect(product.color_change).to eq ["ORANGE", "GREEN"]
+      let(:product) { Product.create(color: 'GREEN') }
+
+      before do
+        product.color = 'GREEN'
+      end
+
+      it "<attr>_changed? should return false" do
+        expect(product.color_changed?).to be false
+      end
+
+      it "changed? should return false" do
+        expect(product.changed?).to be false
+      end
+
+      it "changes should be empty" do
+        expect(product.changes).to be_empty
+      end
+
     end
 
   end
