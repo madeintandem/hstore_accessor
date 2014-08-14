@@ -76,7 +76,7 @@ module HstoreAccessor
           when :array
             send(:scope, "#{key}_eq",        -> value { where("#{query_field} = ?", value.join(Serialization::SEPARATOR)) })
             send(:scope, "#{key}_contains",  -> value do
-              where("string_to_array(#{query_field}, '#{Serialization::SEPARATOR}') @> string_to_array(?, '#{Serialization::SEPARATOR}')", Array[value].flatten)
+              where("string_to_array(#{query_field}, '#{Serialization::SEPARATOR}') @> string_to_array(?, '#{Serialization::SEPARATOR}')", Array[value].flatten.join(Serialization::SEPARATOR))
             end)
           end
         end
