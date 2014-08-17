@@ -449,7 +449,7 @@ describe HstoreAccessor do
           end
 
           def color
-            super.downcase
+            super.try(:downcase)
           end
         end
       end
@@ -487,6 +487,17 @@ describe HstoreAccessor do
       expect(product.color_changed?).to be true
       product.save
       expect(product.color_changed?).to be false
+      product.color = "ORANGE"
+      expect(product.color_changed?).to be false
+
+      expect(product.price_changed?).to be false
+      product.price = 100
+      expect(product.price_changed?).to be true
+      product.save
+      expect(product.price_changed?).to be false
+      product.price = "100"
+      expect(product.price).to be 100
+      expect(product.price_changed?).to be false
     end
 
     it "<attr>_was should return the expected value" do
