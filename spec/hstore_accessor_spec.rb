@@ -240,6 +240,8 @@ describe HstoreAccessor do
       it "contains" do
         expect(Product.tags_contains("tag2").to_a).to eq [product_a, product_b]
         expect(Product.tags_contains(["tag2", "tag3"]).to_a).to eq [product_a, product_b]
+        expect(Product.tags_contains(["tag1", "tag2", "tag3"]).to_a).to eq [product_a]
+        expect(Product.tags_contains(["tag1", "tag2", "tag3", "tag4"]).to_a).to eq []
       end
 
     end
