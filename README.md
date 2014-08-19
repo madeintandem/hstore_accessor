@@ -60,7 +60,7 @@ Reading these fields works as well.
 
 ```ruby
 p.color # => "green"
-p.tags # => ["housewares", "kitchen"]
+p.tags  # => ["housewares", "kitchen"]
 ```
 
 In order to reduce the storage overhead of hstore keys (especially when
@@ -206,7 +206,6 @@ individual fields in an `hstore` column.
 
 This approach was originally concieved by Joe Hirn in [this blog
 post](http://www.devmynd.com/blog/2013-3-single-table-inheritance-hstore-lovely-combination).
-
 
 ## Contributing
 
