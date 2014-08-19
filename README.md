@@ -12,7 +12,7 @@ HstoreAccessor gem solves both of these issues.
 
 Add this line to your application's Gemfile:
 
-    gem 'hstore_accessor'
+    gem "hstore_accessor"
 
 And then execute:
 
@@ -33,7 +33,6 @@ are: `string`, `integer`, `float`, `time`, `boolean`, `array`, and `hash`.
 
 ```ruby
 class Product < ActiveRecord::Base
-
   hstore_accessor :options,
     color: :string,
     weight: :integer,
@@ -41,7 +40,6 @@ class Product < ActiveRecord::Base
     built_at: :time,
     tags: :array,
     ratings: :hash
-
 end
 ```
 
@@ -54,15 +52,15 @@ p.weight = 34
 p.price = 99.95
 p.built_at = Time.now - 10.days
 p.popular = true
-p.tags = ["housewares", "kitchen"]
+p.tags = %w(housewares kitchen)
 p.ratings = { user_a: 3, user_b: 4 }
 ```
 
 Reading these fields works as well.
 
 ```ruby
-p.color #=> "green"
-p.tags #=> ["housewares", "kitchen"] 
+p.color # => "green"
+p.tags # => ["housewares", "kitchen"]
 ```
 
 In order to reduce the storage overhead of hstore keys (especially when
@@ -82,13 +80,13 @@ Additionally, dirty tracking is implemented in the same way that normal
 `ActiveRecord` fields work.
 
 ```ruby
-p.color           #=> "green"
+p.color          #=> "green"
 p.color = "blue"
-p.changed?        #=> true
-p.color_changed?  #=> true
-p.color_was       #=> "green"
-p.color_changes   #=> ["green", "blue"]
-``` 
+p.changed?       #=> true
+p.color_changed? #=> true
+p.color_was      #=> "green"
+p.color_changes  #=> ["green", "blue"]
+```
 
 ### Scopes
 
@@ -109,11 +107,11 @@ Product.with_color("green")
 For `integer` and `float` types five scopes are created:
 
 ```ruby
-Product.price_lt(240.00)    # price less than
-Product.price_lte(240.00)   # price less than or equal to
-Product.price_eq(240.00)    # price equal to
-Product.price_gte(240.00)   # price greater than or equal to
-Product.price_gt(240.00)    # price greater than
+Product.price_lt(240.00)  # price less than
+Product.price_lte(240.00) # price less than or equal to
+Product.price_eq(240.00)  # price equal to
+Product.price_gte(240.00) # price greater than or equal to
+Product.price_gt(240.00)  # price greater than
 ```
 
 #### Time Fields
@@ -131,9 +129,9 @@ Product.built_at_after(Time.now - 4.days) # built after the given time
 For `array` types, two scopes are created:
 
 ```ruby
-Product.tags_eq(["housewares", "kitchen"])        # tags equaling
-Product.tags_contains("kitchen")                  # tags containing a single value
-Product.tags_contains(["housewares", "kitchen"])  # tags containing a number of values
+Product.tags_eq(%w(housewares kitchen))       # tags equaling
+Product.tags_contains("kitchen")              # tags containing a single value
+Product.tags_contains(%w(housewares kitchen)) # tags containing a number of values
 ```
 
 #### Boolean Fields
@@ -141,15 +139,15 @@ Product.tags_contains(["housewares", "kitchen"])  # tags containing a number of 
 Two scopes are created for `boolean` fields:
 
 ```ruby
-Product.is_popular    # => when populer is set to true
-Product.not_popular   # => when populer is set to false
+Product.is_popular  # => when populer is set to true
+Product.not_popular # => when populer is set to false
 ```
 
 Predicate methods are also available on instances:
 
 ```ruby
 product = Product.new(popular: true)
-product.popular?  #=> true
+product.popular? # => true
 ```
 
 ### Single-table Inheritance
