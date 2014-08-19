@@ -1,6 +1,5 @@
 module HstoreAccessor
   module TimeHelper
-
     # There is a bug in ActiveRecord::ConnectionAdapters::Column#string_to_time
     # which drops the timezone. This has been fixed, but not released.
     # This method includes the fix. See: https://github.com/rails/rails/pull/12290
@@ -26,6 +25,5 @@ module HstoreAccessor
         Time.public_send(ActiveRecord::Base.default_timezone, year, mon, mday, hour, min, sec, microsec) rescue nil
       end
     end
-
   end
 end
