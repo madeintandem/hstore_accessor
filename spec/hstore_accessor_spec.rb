@@ -300,6 +300,13 @@ describe HstoreAccessor do
     end
 
     context "array values" do
+      it "correctly stores nothing" do
+        product.tags = nil
+        product.save
+        product.reload
+        expect(product.tags).to be_nil
+      end
+
       it "correctly stores strings" do
         product.tags = ["household", "living room", "kitchen"]
         product.save
@@ -330,6 +337,13 @@ describe HstoreAccessor do
     end
 
     context "hash values" do
+      it "correctly stores nothing" do
+        product.reviews = nil
+        product.save
+        product.reload
+        expect(product.reviews).to be_nil
+      end
+
       it "correctly stores stringy-keyed hash values" do
         product.reviews = { "user_123" => "4 stars", "user_994" => "3 stars" }
         product.save
