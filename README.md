@@ -212,3 +212,12 @@ post](http://www.devmynd.com/blog/2013-3-single-table-inheritance-hstore-lovely-
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+## Changelog
+
+`2.0.0` - Changed the way that hashes and arrays are serialized into the
+Hstore column. We are using YAML now. This allows for more complex
+data structures within those types. It also allows us to keep Rubyisms like
+symbols, integers, hashes, arrays and even custom objects in those Hstore
+attributes. In turn, this makes it difficult to query specific array values
+in the column's attributes. So, the `_contains` scope has been eliminated.
