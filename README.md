@@ -129,9 +129,7 @@ Product.built_at_after(Time.now - 4.days) # built after the given time
 For `array` types, two scopes are created:
 
 ```ruby
-Product.tags_eq(%w(housewares kitchen))       # tags equaling
-Product.tags_contains("kitchen")              # tags containing a single value
-Product.tags_contains(%w(housewares kitchen)) # tags containing a number of values
+Product.tags_eq(%w(housewares kitchen)) # tags equaling
 ```
 
 #### Boolean Fields

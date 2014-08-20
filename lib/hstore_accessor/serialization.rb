@@ -10,16 +10,23 @@ module HstoreAccessor
     DEFAULT_DESERIALIZER = DEFAULT_SERIALIZER
 
     SERIALIZERS = {
-      array: -> value { (value && value.join(SEPARATOR)) || nil },
-      hash: -> value { (value && value.to_json) || nil },
+      array: -> value { (value && YAML.dump(Array.wrap(value))) || nil },
+      hash: lambda do |value|
+        if value
+          raise InvalidDataTypeError, "Cannot serialize a non-hash value into the hash typed attribute" unless value.is_a?(Hash)
+          YAML.dump(value)
+        else
+          nil
+        end
+      end,
       time: -> value { value.to_i },
       boolean: -> value { (value.to_s == "true").to_s },
       date: -> value { (value && value.to_s) || nil }
     }
 
     DESERIALIZERS = {
-      array: -> value { (value && value.split(SEPARATOR)) || nil },
-      hash: -> value { (value && JSON.parse(value)) || nil },
+      array: -> value { (value && YAML.load(value)) || nil },
+      hash: -> value { (value && YAML.load(value)) || nil },
       integer: -> value { value.to_i },
       float: -> value { value.to_f },
       time: -> value { Time.at(value.to_i) },
