@@ -344,10 +344,30 @@ describe HstoreAccessor do
         expect(product.reviews).to eq("user_123" => [1, 2], "user_994" => "stringy", foo: :bar, baz: 1, zoo: "zaz", hashy: { test: 1 })
       end
 
+      it "correctly stores an object" do
+        class Stuff
+          attr_accessor :thing
+        end
+
+        stuff = Stuff.new
+        stuff.thing = "1"
+
+        product.reviews = { "stuff" => stuff }
+        product.save
+        product.reload
+
+        expect(product.reviews["stuff"].thing).to eq(stuff.thing)
+
+        Object.send(:remove_const, :Stuff)
+        product.reload
+
+        expect { product.reviews }.to raise_error
+      end
+
       it "raises an exception when trying to store a non-hash value" do
-        expect {
+        expect do
           product.reviews = "hello"
-        }.to raise_error(HstoreAccessor::Serialization::InvalidDataTypeError)
+        end.to raise_error(HstoreAccessor::Serialization::InvalidDataTypeError)
       end
     end
 
