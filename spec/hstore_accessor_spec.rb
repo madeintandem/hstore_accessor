@@ -321,7 +321,7 @@ describe HstoreAccessor do
         expect(product.tags).to eq [1, 2, "3"]
       end
 
-      it "correctly stores hashes with indifferent access" do
+      it "correctly stores hashes" do
         product.tags = [{ foo: "bar" }, { "baz" => 123 }]
         product.save
         product.reload

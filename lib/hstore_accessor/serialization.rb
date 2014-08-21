@@ -8,29 +8,27 @@ module HstoreAccessor
     DEFAULT_DESERIALIZER = DEFAULT_SERIALIZER
 
     SERIALIZERS = {
-      array: -> value { (value && YAML.dump(Array.wrap(value))) || nil },
+      array: -> value { value && YAML.dump(Array.wrap(value)) },
       boolean: -> value { (value.to_s == "true").to_s },
-      date: -> value { (value && value.to_s) || nil },
+      date: -> value { value && value.to_s },
       hash: lambda do |value|
         if value
           raise InvalidDataTypeError, "Cannot serialize a non-hash value into the hash typed attribute" unless value.is_a?(Hash)
           YAML.dump(value)
-        else
-          nil
         end
       end,
-      time: -> value { (value && value.to_i) || nil }
+      time: -> value { value && value.to_i }
     }
 
     DESERIALIZERS = {
-      array: -> value { (value && YAML.load(value)) || nil },
+      array: -> value { value && YAML.load(value) },
       boolean: -> value { TypeHelpers.cast(:boolean, value) },
-      date: -> value { (value && Date.parse(value)) || nil },
-      decimal: -> value { (value && BigDecimal.new(value)) || nil },
-      float: -> value { (value && value.to_f) || nil },
-      hash: -> value { (value && YAML.load(value)) || nil },
-      integer: -> value { (value && value.to_i) || nil },
-      time: -> value { (value && Time.at(value.to_i)) || nil }
+      date: -> value { value && Date.parse(value) },
+      decimal: -> value { value && BigDecimal.new(value) },
+      float: -> value { value && value.to_f },
+      hash: -> value { value && YAML.load(value) },
+      integer: -> value { value && value.to_i },
+      time: -> value { value && Time.at(value.to_i) }
     }
 
     def serialize(type, value, serializer=nil)
