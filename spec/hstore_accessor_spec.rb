@@ -459,6 +459,7 @@ describe HstoreAccessor do
     it "<attr>_changed? should return the expected value" do
       expect(product.color_changed?).to be false
       product.color = "ORANGE"
+      expect(product.price_changed?).to be false
       expect(product.color_changed?).to be true
       product.save
       expect(product.color_changed?).to be false
