@@ -27,7 +27,6 @@ module HstoreAccessor
             serialized_value = serialize(data_type, casted_value)
 
             unless send(key) == casted_value
-              send(:attribute_will_change!, key)
               send("#{hstore_attribute}_will_change!")
             end
 
@@ -44,15 +43,15 @@ module HstoreAccessor
           end
 
           field_methods.send(:define_method, "#{key}_changed?") do
-            send(:attribute_changed?, key)
+            send("#{key}_change").present?
           end
 
           field_methods.send(:define_method, "#{key}_was") do
-            send(:attribute_was, key)
+            send(:attribute_was, hstore_attribute)[key]
           end
 
           field_methods.send(:define_method, "#{key}_change") do
-            send(:attribute_change, key)
+            Array(send(:changes)[hstore_attribute]).map { |hash| hash[key] if hash }.compact
           end
 
           query_field = "#{hstore_attribute} -> '#{store_key}'"
