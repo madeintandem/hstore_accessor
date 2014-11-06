@@ -27,8 +27,12 @@ module HstoreAccessor
             serialized_value = serialize(data_type, casted_value)
 
             unless send(key) == casted_value
-              send(:attribute_will_change!, key)
-              send("#{hstore_attribute}_will_change!")
+              if send(:attribute_was, key) == casted_value
+                changed_attributes.delete(key)
+              else
+                send(:attribute_will_change!, key)
+                send("#{hstore_attribute}_will_change!")
+              end
             end
 
             send("#{hstore_attribute}=", (send(hstore_attribute) || {}).merge(store_key.to_s => serialized_value))
@@ -53,6 +57,10 @@ module HstoreAccessor
 
           field_methods.send(:define_method, "#{key}_change") do
             send(:attribute_change, key)
+          end
+
+          field_methods.send(:define_method, "reset_#{key}!") do
+            send(:reset_attribute!, key)
           end
 
           query_field = "#{hstore_attribute} -> '#{store_key}'"
