@@ -29,7 +29,7 @@ Or install it yourself as:
 The `hstore_accessor` method accepts the name of the hstore column you'd
 like to use and a hash with keys representing fields and values
 indicating the type to be stored in that field.  The available types
-are: `string`, `integer`, `float`, `time`, `boolean`, `array`, and `hash`.
+are: `string`, `integer`, `float`, `decimal`, `time`, `date`, `boolean`, `array`, and `hash`.
 
 ```ruby
 class Product < ActiveRecord::Base
@@ -38,8 +38,10 @@ class Product < ActiveRecord::Base
     weight: :integer,
     price: :float,
     built_at: :time,
+    build_date: :date,
     tags: :array,
     ratings: :hash
+    miles: :decimal
 end
 ```
 
@@ -51,9 +53,11 @@ p.color = "green"
 p.weight = 34
 p.price = 99.95
 p.built_at = Time.now - 10.days
+p.build_date = Date.today
 p.popular = true
 p.tags = %w(housewares kitchen)
 p.ratings = { user_a: 3, user_b: 4 }
+p.miles = 3.14
 ```
 
 Reading these fields works as well.
@@ -91,7 +95,7 @@ p.color_changes  #=> ["green", "blue"]
 ### Scopes
 
 The `hstore_accessor` macro also creates scopes for `string`, `integer`,
-`float`, `time`, `boolean`, and `array` fields.
+`float`, `decimal`, `time`, `date`, `boolean`, and `array` fields.
 
 #### String Fields
 
@@ -102,9 +106,9 @@ equality.
 Product.with_color("green")
 ```
 
-#### Integer and Float Fields
+#### Integer, Float, Decimal Fields
 
-For `integer` and `float` types five scopes are created:
+For `integer`, `float` and `decimal` types five scopes are created:
 
 ```ruby
 Product.price_lt(240.00)  # price less than
@@ -116,12 +120,22 @@ Product.price_gt(240.00)  # price greater than
 
 #### Time Fields
 
-For `time` fileds, three scopes are provided:
+For `time` fields, three scopes are created:
 
 ```ruby
 Product.built_at_before(Time.now)         # built before the given time
 Product.built_at_eq(Time.now - 10.days)   # built at an exact time
 Product.built_at_after(Time.now - 4.days) # built after the given time
+```
+
+#### Date Fields
+
+For `date` fields, three scopes are created:
+
+```ruby
+Product.build_date_before(Date.today)         # built before the given date
+Product.build_date_eq(Date.today - 10.days)   # built at an exact date
+Product.built_date_after(Date.today - 4.days) # built after the given date
 ```
 
 #### Array Fields
