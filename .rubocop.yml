@@ -7,6 +7,8 @@ Lint/UnusedBlockArgument:
   Enabled: false
 Lint/UnusedMethodArgument:
   Enabled: false
+Metrics/AbcSize:
+  Enabled: false
 Metrics/ClassLength:
   Enabled: false
 Metrics/CyclomaticComplexity:
