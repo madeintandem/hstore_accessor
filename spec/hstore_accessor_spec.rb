@@ -26,9 +26,7 @@ describe HstoreAccessor do
       it "creates a getter for the hstore field: #{field}" do
         expect(product).to respond_to(field)
       end
-    end
 
-    FIELDS.keys.each do |field|
       it "creates a setter for the hstore field: #{field}=" do
         expect(product).to respond_to(:"#{field}=")
       end
@@ -63,19 +61,17 @@ describe HstoreAccessor do
   context "nil values" do
     let!(:timestamp) { Time.now }
     let!(:datestamp) { Date.today }
-    let!(:product) { Product.new }
-    let!(:product_a) { Product.create(color: "green", price: 10, weight: 10.1, tags: %w(tag1 tag2 tag3), popular: true, build_timestamp: (timestamp - 10.days), released_at: (datestamp - 8.days), miles: BigDecimal.new("9.133790001")) }
+    let(:product) { Product.new }
+    let(:persisted_product) { Product.create!(color: "green", price: 10, weight: 10.1, tags: %w(tag1 tag2 tag3), popular: true, build_timestamp: (timestamp - 10.days), released_at: (datestamp - 8.days), miles: BigDecimal.new("9.133790001")) }
 
     FIELDS.keys.each do |field|
       it "responds with nil when #{field} is not set" do
         expect(product.send(field)).to be_nil
       end
-    end
 
-    FIELDS.keys.each do |field|
       it "responds with nil when #{field} is set back to nil after being set initially" do
-        product_a.send("#{field}=", nil)
-        expect(product_a.send(field)).to be_nil
+        persisted_product.send("#{field}=", nil)
+        expect(persisted_product.send(field)).to be_nil
       end
     end
   end
