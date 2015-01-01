@@ -54,6 +54,10 @@ module HstoreAccessor
             Array(send(:changes)[hstore_attribute]).map { |hash| hash[key] if hash }.compact
           end
 
+          field_methods.send(:define_method, "reset_#{key}!") do
+            send(:reset_attribute!, key)
+          end
+
           query_field = "#{hstore_attribute} -> '#{store_key}'"
 
           case data_type
