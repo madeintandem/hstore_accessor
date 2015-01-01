@@ -54,8 +54,17 @@ module HstoreAccessor
             Array(send(:changes)[hstore_attribute]).map { |hash| hash[key] if hash }.compact
           end
 
+          field_methods.send(:define_method, "restore_#{key}!") do
+            old_hstore = send("#{hstore_attribute}_change").try(:first) || {}
+            send("#{key}=", old_hstore[key.to_s])
+          end
+
           field_methods.send(:define_method, "reset_#{key}!") do
-            send(:reset_attribute!, key)
+            ActiveSupport::Deprecation.warn(<<-MSG.squish)
+              `#reset_#{key}!` is deprecated and will be removed on Rails 5.
+              Please use `#restore_#{key}!` instead.
+            MSG
+            send("restore_#{key}!")
           end
 
           field_methods.send(:define_method, "#{key}_will_change!") do

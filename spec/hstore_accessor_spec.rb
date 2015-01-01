@@ -501,5 +501,38 @@ describe HstoreAccessor do
       product.color = "GREEN"
       expect(product.color_change).to eq %w(ORANGE GREEN)
     end
+
+    describe "#reset_<attr>!" do
+      before do
+        allow(ActiveSupport::Deprecation).to receive(:warn)
+      end
+      it "displays a deprecation warning" do
+        expect(ActiveSupport::Deprecation).to receive(:warn)
+        product.reset_color!
+      end
+
+      it "restores the attribute" do
+        expect(product).to receive(:restore_color!)
+        product.reset_color!
+      end
+    end
+
+    describe "#restore_<attr>!" do
+      it "restores the attribute" do
+        product.color = "red"
+        product.restore_color!
+        expect(product.color).to be_nil
+      end
+
+      context "persisted" do
+        it "restores the attribute" do
+          green = product.color = "green"
+          product.save!
+          product.color = "red"
+          product.restore_color!
+          expect(product.color).to eq(green)
+        end
+      end
+    end
   end
 end

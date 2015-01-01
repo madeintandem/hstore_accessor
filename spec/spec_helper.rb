@@ -27,5 +27,6 @@ def create_database
 
   ActiveRecord::Base.connection.create_table(:products) do |t|
     t.hstore :options
+    t.string :foo
   end
 end
