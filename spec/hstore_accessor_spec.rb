@@ -479,11 +479,20 @@ describe HstoreAccessor do
       end
     end
 
-    it "<attr>_was should return the expected value" do
-      product.color = "ORANGE"
-      product.save
-      product.color = "GREEN"
-      expect(product.color_was).to eq "ORANGE"
+    describe "#<attr>_was" do
+      it "returns the expected value" do
+        product.color = "ORANGE"
+        product.save
+        product.color = "GREEN"
+        expect(product.color_was).to eq "ORANGE"
+      end
+
+      it "works when the hstore attribute is nil" do
+        product.options = nil
+        product.save
+        product.color = "green"
+        expect { product.color_was }.to_not raise_error
+      end
     end
 
     it "<attr>_change should return the expected value" do
