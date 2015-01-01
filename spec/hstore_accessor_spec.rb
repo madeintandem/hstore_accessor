@@ -472,6 +472,13 @@ describe HstoreAccessor do
       expect(product.price_changed?).to be false
     end
 
+    describe "#<attr>_will_change!" do
+      it "tells ActiveRecord the hstore attribute has changed" do
+        expect(product).to receive(:options_will_change!)
+        product.color_will_change!
+      end
+    end
+
     it "<attr>_was should return the expected value" do
       product.color = "ORANGE"
       product.save

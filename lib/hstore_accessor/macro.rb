@@ -58,6 +58,10 @@ module HstoreAccessor
             send(:reset_attribute!, key)
           end
 
+          field_methods.send(:define_method, "#{key}_will_change!") do
+            send("#{hstore_attribute}_will_change!")
+          end
+
           query_field = "#{hstore_attribute} -> '#{store_key}'"
 
           case data_type
