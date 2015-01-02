@@ -20,12 +20,14 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "activesupport", ">= 3.2.0"
 
-  spec.add_development_dependency "activerecord", ">= 4.0.0"
-  spec.add_development_dependency "bundler", "~> 1.3"
+  spec.add_development_dependency "activerecord", ">= 4.2.0"
+  spec.add_development_dependency "bundler", "~> 1.7"
   spec.add_development_dependency "rake"
-  spec.add_development_dependency "rspec"
+  spec.add_development_dependency "rspec", "~> 3.1.0"
   spec.add_development_dependency "rubocop"
   spec.add_development_dependency "pry"
+  spec.add_development_dependency "pry-nav"
+  spec.add_development_dependency "pry-doc"
   spec.add_development_dependency "database_cleaner"
 
   spec.post_install_message = "Please note that there are breaking changes in version 2.0.0! Refer to the changelog here...\nhttps://github.com/devmynd/hstore_accessor"

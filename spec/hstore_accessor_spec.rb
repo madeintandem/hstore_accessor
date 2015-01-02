@@ -26,9 +26,7 @@ describe HstoreAccessor do
       it "creates a getter for the hstore field: #{field}" do
         expect(product).to respond_to(field)
       end
-    end
 
-    FIELDS.keys.each do |field|
       it "creates a setter for the hstore field: #{field}=" do
         expect(product).to respond_to(:"#{field}=")
       end
@@ -63,19 +61,17 @@ describe HstoreAccessor do
   context "nil values" do
     let!(:timestamp) { Time.now }
     let!(:datestamp) { Date.today }
-    let!(:product) { Product.new }
-    let!(:product_a) { Product.create(color: "green", price: 10, weight: 10.1, tags: %w(tag1 tag2 tag3), popular: true, build_timestamp: (timestamp - 10.days), released_at: (datestamp - 8.days), miles: BigDecimal.new("9.133790001")) }
+    let(:product) { Product.new }
+    let(:persisted_product) { Product.create!(color: "green", price: 10, weight: 10.1, tags: %w(tag1 tag2 tag3), popular: true, build_timestamp: (timestamp - 10.days), released_at: (datestamp - 8.days), miles: BigDecimal.new("9.133790001")) }
 
     FIELDS.keys.each do |field|
       it "responds with nil when #{field} is not set" do
         expect(product.send(field)).to be_nil
       end
-    end
 
-    FIELDS.keys.each do |field|
       it "responds with nil when #{field} is set back to nil after being set initially" do
-        product_a.send("#{field}=", nil)
-        expect(product_a.send(field)).to be_nil
+        persisted_product.send("#{field}=", nil)
+        expect(persisted_product.send(field)).to be_nil
       end
     end
   end
@@ -524,6 +520,7 @@ describe HstoreAccessor do
     it "<attr>_changed? should return the expected value" do
       expect(product.color_changed?).to be false
       product.color = "ORANGE"
+      expect(product.price_changed?).to be false
       expect(product.color_changed?).to be true
       product.save
       expect(product.color_changed?).to be false
@@ -540,18 +537,94 @@ describe HstoreAccessor do
       expect(product.price_changed?).to be false
     end
 
-    it "<attr>_was should return the expected value" do
-      product.color = "ORANGE"
-      product.save
-      product.color = "GREEN"
-      expect(product.color_was).to eq "ORANGE"
+    describe "#<attr>_will_change!" do
+      it "tells ActiveRecord the hstore attribute has changed" do
+        expect(product).to receive(:options_will_change!)
+        product.color_will_change!
+      end
     end
 
-    it "<attr>_change should return the expected value" do
-      product.color = "ORANGE"
-      product.save
-      product.color = "GREEN"
-      expect(product.color_change).to eq %w(ORANGE GREEN)
+    describe "#<attr>_was" do
+      it "returns the expected value" do
+        product.color = "ORANGE"
+        product.save
+        product.color = "GREEN"
+        expect(product.color_was).to eq "ORANGE"
+      end
+
+      it "works when the hstore attribute is nil" do
+        product.options = nil
+        product.save
+        product.color = "green"
+        expect { product.color_was }.to_not raise_error
+      end
+    end
+
+    describe "#<attr>_change" do
+      it "returns the old and new values" do
+        product.color = "ORANGE"
+        product.save
+        product.color = "GREEN"
+        expect(product.color_change).to eq %w(ORANGE GREEN)
+      end
+
+      context "hstore attribute was nil" do
+        it "returns old and new values" do
+          product.options = nil
+          product.save!
+          green = product.color = "green"
+          expect(product.color_change).to eq([nil, green])
+        end
+      end
+
+      context "other hstore attributes were persisted" do
+        it "returns nil" do
+          product.price = 5
+          product.save!
+          product.price = 6
+          expect(product.color_change).to be_nil
+        end
+      end
+
+      context "not persisted" do
+        it "returns nil when there are no changes" do
+          expect(product.color_change).to be_nil
+        end
+      end
+    end
+
+    describe "#reset_<attr>!" do
+      before do
+        allow(ActiveSupport::Deprecation).to receive(:warn)
+      end
+
+      it "displays a deprecation warning" do
+        expect(ActiveSupport::Deprecation).to receive(:warn)
+        product.reset_color!
+      end
+
+      it "restores the attribute" do
+        expect(product).to receive(:restore_color!)
+        product.reset_color!
+      end
+    end
+
+    describe "#restore_<attr>!" do
+      it "restores the attribute" do
+        product.color = "red"
+        product.restore_color!
+        expect(product.color).to be_nil
+      end
+
+      context "persisted" do
+        it "restores the attribute" do
+          green = product.color = "green"
+          product.save!
+          product.color = "red"
+          product.restore_color!
+          expect(product.color).to eq(green)
+        end
+      end
     end
   end
 end
