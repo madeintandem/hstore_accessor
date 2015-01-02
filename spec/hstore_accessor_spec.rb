@@ -503,8 +503,26 @@ describe HstoreAccessor do
         expect(product.color_change).to eq %w(ORANGE GREEN)
       end
 
-      context "not persisted" do
+      context "hstore attribute was nil" do
+        it "returns old and new values" do
+          product.options = nil
+          product.save!
+          green = product.color = "green"
+          expect(product.color_change).to eq([nil, green])
+        end
+      end
+
+      context "other hstore attributes were persisted" do
         it "returns nil" do
+          product.price = 5
+          product.save!
+          product.price = 6
+          expect(product.color_change).to be_nil
+        end
+      end
+
+      context "not persisted" do
+        it "returns nil when there are no changes" do
           expect(product.color_change).to be_nil
         end
       end
@@ -514,6 +532,7 @@ describe HstoreAccessor do
       before do
         allow(ActiveSupport::Deprecation).to receive(:warn)
       end
+
       it "displays a deprecation warning" do
         expect(ActiveSupport::Deprecation).to receive(:warn)
         product.reset_color!
