@@ -129,9 +129,7 @@ Product.built_at_after(Time.now - 4.days) # built after the given time
 For `array` types, two scopes are created:
 
 ```ruby
-Product.tags_eq(%w(housewares kitchen))       # tags equaling
-Product.tags_contains("kitchen")              # tags containing a single value
-Product.tags_contains(%w(housewares kitchen)) # tags containing a number of values
+Product.tags_eq(%w(housewares kitchen)) # tags equaling
 ```
 
 #### Boolean Fields
@@ -215,3 +213,12 @@ post](http://www.devmynd.com/blog/2013-3-single-table-inheritance-hstore-lovely-
 4. Commit your changes (`git commit -am 'Add some feature'`)
 5. Push to the branch (`git push origin my-new-feature`)
 6. Create new Pull Request
+
+## Changelog
+
+`1.0.0` - Changed the way that hashes and arrays are serialized into the
+Hstore column. We are using YAML now. This allows for more complex
+data structures within those types. It also allows us to keep Rubyisms like
+symbols, integers, hashes, arrays and even custom objects in those Hstore
+attributes. In turn, this makes it difficult to query specific array values
+in the column's attributes. So, the `_contains` scope has been eliminated.
