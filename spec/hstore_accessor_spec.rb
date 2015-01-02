@@ -495,11 +495,19 @@ describe HstoreAccessor do
       end
     end
 
-    it "<attr>_change should return the expected value" do
-      product.color = "ORANGE"
-      product.save
-      product.color = "GREEN"
-      expect(product.color_change).to eq %w(ORANGE GREEN)
+    describe "#<attr>_change" do
+      it "returns the old and new values" do
+        product.color = "ORANGE"
+        product.save
+        product.color = "GREEN"
+        expect(product.color_change).to eq %w(ORANGE GREEN)
+      end
+
+      context "not persisted" do
+        it "returns nil" do
+          expect(product.color_change).to be_nil
+        end
+      end
     end
 
     describe "#reset_<attr>!" do

@@ -51,7 +51,8 @@ module HstoreAccessor
           end
 
           field_methods.send(:define_method, "#{key}_change") do
-            Array(send(:changes)[hstore_attribute]).map { |hash| hash[key] if hash }.compact
+            changes = Array(send(:changes)[hstore_attribute]).map { |hash| hash[key] if hash }.compact
+            changes.present? ? changes : nil
           end
 
           field_methods.send(:define_method, "restore_#{key}!") do
