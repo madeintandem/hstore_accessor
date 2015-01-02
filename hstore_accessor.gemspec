@@ -6,8 +6,8 @@ require "hstore_accessor/version"
 Gem::Specification.new do |spec|
   spec.name          = "hstore_accessor"
   spec.version       = HstoreAccessor::VERSION
-  spec.authors       = ["Joe Hirn", "Cory Stephenson", "JC Grubbs"]
-  spec.email         = ["joe@devmynd.com", "cory@devmynd.com", "jc@devmynd.com"]
+  spec.authors       = ["Joe Hirn", "Cory Stephenson", "JC Grubbs", "Tony Coconate"]
+  spec.email         = ["joe@devmynd.com", "cory@devmynd.com", "jc@devmynd.com", "me@tonycoconate.com"]
   spec.description   = %q{Adds typed hstore backed fields to an ActiveRecord model.}
   spec.summary       = %q{Adds typed hstore backed fields to an ActiveRecord model.}
   spec.homepage      = "http://github.com/devmynd/hstore_accessor"
@@ -29,4 +29,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "pry-nav"
   spec.add_development_dependency "pry-doc"
   spec.add_development_dependency "database_cleaner"
+
+  spec.post_install_message = "Please note that there are breaking changes in version 2.0.0! Refer to the changelog here...\nhttps://github.com/devmynd/hstore_accessor"
 end
