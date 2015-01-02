@@ -30,5 +30,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "pry-doc"
   spec.add_development_dependency "database_cleaner"
 
-  spec.post_install_message = "Please note that there are breaking changes in version 2.0.0! Refer to the changelog here...\nhttps://github.com/devmynd/hstore_accessor"
+  spec.post_install_message = "Please note that there are breaking changes in version 1.0.0! Refer to the changelog here...\nhttps://github.com/devmynd/hstore_accessor#changelog"
 end
