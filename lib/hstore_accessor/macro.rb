@@ -101,8 +101,8 @@ module HstoreAccessor
             send(:scope, "#{key}_eq", -> value { where(eq_query_field, value.to_s) })
             send(:scope, "#{key}_after", -> value { where("#{query_field} > ?", value.to_s) })
           when :boolean
-            send(:scope, "is_#{key}", -> { where(eq_query_field, 'true') })
-            send(:scope, "not_#{key}", -> { where(eq_query_field, 'false') })
+            send(:scope, "is_#{key}", -> { where(eq_query_field, "true") })
+            send(:scope, "not_#{key}", -> { where(eq_query_field, "false") })
           when :array
             send(:scope, "#{key}_eq", -> value { where("#{query_field} = ?", YAML.dump(Array.wrap(value))) })
           end
