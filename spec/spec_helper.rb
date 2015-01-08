@@ -1,5 +1,6 @@
 require "hstore_accessor"
 require "database_cleaner"
+require "shoulda-matchers"
 
 DatabaseCleaner.strategy = :truncation
 
@@ -27,6 +28,15 @@ def create_database
 
   ActiveRecord::Base.connection.create_table(:products) do |t|
     t.hstore :options
-    t.string :foo
+    t.hstore :data
+
+    t.string :string_type
+    t.integer :integer_type
+    t.boolean :boolean_type
+    t.float :float_type
+    t.time :time_type
+    t.string :array_type, array: true
+    t.date :date_type
+    t.decimal :decimal_type
   end
 end

@@ -2,8 +2,12 @@ module HstoreAccessor
   module Macro
     module ClassMethods
       def hstore_accessor(hstore_attribute, fields)
-        define_method("hstore_metadata_for_#{hstore_attribute}") do
-          fields
+        "hstore_metadata_for_#{hstore_attribute}".tap do |method_name|
+          singleton_class.send(:define_method, method_name) do
+            fields
+          end
+
+          delegate method_name, to: :class
         end
 
         field_methods = Module.new

@@ -14,8 +14,13 @@ FIELDS = {
   miles: :decimal
 }
 
+DATA_FIELDS = {
+  color_data: :string
+}
+
 class Product < ActiveRecord::Base
   hstore_accessor :options, FIELDS
+  hstore_accessor :data, DATA_FIELDS
 end
 
 describe HstoreAccessor do
@@ -50,11 +55,18 @@ describe HstoreAccessor do
     end
   end
 
-  context "#__hstore_metadata_for_*" do
-    let(:product) { Product.new }
+  context "#hstore_metadata_for_*" do
+    let(:product) { Product }
 
     it "returns the metadata hash for the specified field" do
       expect(product.hstore_metadata_for_options).to eq FIELDS
+      expect(product.hstore_metadata_for_data).to eq DATA_FIELDS
+    end
+
+    context "instance method" do
+      subject { Product.new }
+      it { is_expected.to delegate_method(:hstore_metadata_for_options).to(:class) }
+      it { is_expected.to delegate_method(:hstore_metadata_for_data).to(:class) }
     end
   end
 
