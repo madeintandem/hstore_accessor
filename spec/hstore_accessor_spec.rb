@@ -265,6 +265,46 @@ describe HstoreAccessor do
     end
   end
 
+  describe "#type_for_attribute" do
+    subject { Product }
+
+    context "string" do
+      it "returns the type" do
+        expect(subject.type_for_attribute("color")).to eq(ActiveRecord::Type::Value.new)
+      end
+    end
+
+    context "integer" do
+      it "returns the type" do
+        expect(subject.type_for_attribute("price")).to eq(ActiveRecord::Type::Integer.new)
+      end
+    end
+
+    context "float" do
+      it "returns the type" do
+        expect(subject.type_for_attribute("weight")).to eq(ActiveRecord::Type::Float.new)
+      end
+    end
+
+    context "time" do
+      it "returns the type" do
+        expect(subject.type_for_attribute("build_timestamp")).to eq(ActiveRecord::Type::DateTime.new)
+      end
+    end
+
+    context "date" do
+      it "returns the type" do
+        expect(subject.type_for_attribute("released_at")).to eq(ActiveRecord::Type::Date.new)
+      end
+    end
+
+    context "boolean" do
+      it "returns the type" do
+        expect(subject.type_for_attribute("published")).to eq(ActiveRecord::Type::Boolean.new)
+      end
+    end
+  end
+
   context "when assigning values it" do
     let(:product) { Product.new }
 
@@ -390,6 +430,18 @@ describe HstoreAccessor do
         expect do
           product.reviews = "hello"
         end.to raise_error(HstoreAccessor::Serialization::InvalidDataTypeError)
+      end
+    end
+
+    context "multipart values" do
+      it "stores multipart dates correctly" do
+        product.update_attributes!(
+          "released_at(1i)" => "2014",
+          "released_at(2i)" => "04",
+          "released_at(3i)" => "14"
+        )
+        product.reload
+        expect(product.released_at).to eq(Date.new(2014, 4, 14))
       end
     end
 

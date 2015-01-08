@@ -2,6 +2,8 @@ module HstoreAccessor
   module Macro
     module ClassMethods
       def hstore_accessor(hstore_attribute, fields)
+        @hstore_keys_and_types ||= {}
+
         "hstore_metadata_for_#{hstore_attribute}".tap do |method_name|
           singleton_class.send(:define_method, method_name) do
             fields
@@ -11,6 +13,15 @@ module HstoreAccessor
         end
 
         field_methods = Module.new
+
+        singleton_class.send(:define_method, :type_for_attribute) do |attribute|
+          data_type = @hstore_keys_and_types[attribute]
+          if data_type
+            TypeHelpers.types[data_type] || ActiveRecord::Type::Value.new
+          else
+            super(type)
+          end
+        end
 
         fields.each do |key, type|
           data_type = type
@@ -25,6 +36,8 @@ module HstoreAccessor
           data_type = data_type.to_sym
 
           raise Serialization::InvalidDataTypeError unless Serialization::VALID_TYPES.include?(data_type)
+
+          @hstore_keys_and_types[key.to_s] = data_type
 
           field_methods.send(:define_method, "#{key}=") do |value|
             casted_value = TypeHelpers.cast(data_type, value)
