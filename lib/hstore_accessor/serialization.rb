@@ -19,6 +19,7 @@ module HstoreAccessor
       end,
       time: -> value { value && value.to_i }
     }
+    SERIALIZERS.default = DEFAULT_SERIALIZER
 
     DESERIALIZERS = {
       array: -> value { value && YAML.load(value) },
@@ -30,18 +31,17 @@ module HstoreAccessor
       integer: -> value { value && value.to_i },
       time: -> value { value && Time.at(value.to_i) }
     }
+    DESERIALIZERS.default = DEFAULT_DESERIALIZER
 
-    def serialize(type, value, serializer=nil)
+    def serialize(type, value, serializer=SERIALIZERS[type])
       return nil if value.nil?
 
-      serializer ||= (SERIALIZERS[type] || DEFAULT_SERIALIZER)
       serializer.call(value)
     end
 
-    def deserialize(type, value, deserializer=nil)
+    def deserialize(type, value, deserializer=DESERIALIZERS[type])
       return nil if value.nil?
 
-      deserializer ||= (DESERIALIZERS[type] || DEFAULT_DESERIALIZER)
       deserializer.call(value)
     end
   end
