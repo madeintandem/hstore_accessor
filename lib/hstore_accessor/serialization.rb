@@ -29,7 +29,7 @@ module HstoreAccessor
       float: -> value { value && value.to_f },
       hash: -> value { value && YAML.load(value) },
       integer: -> value { value && value.to_i },
-      datetime: -> value { value && Time.at(value.to_i) }
+      datetime: -> value { value && Time.at(value.to_i).in_time_zone }
     }
     DESERIALIZERS.default = DEFAULT_DESERIALIZER
 
