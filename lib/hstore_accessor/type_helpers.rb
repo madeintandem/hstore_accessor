@@ -21,6 +21,7 @@ module HstoreAccessor
             float: ::ActiveRecord::Type::Float.new,
             time: ::ActiveRecord::Type::DateTime.new,
             date: ::ActiveRecord::Type::Date.new,
+            string: ::ActiveRecord::Type::String.new,
             boolean: ::ActiveRecord::Type::Boolean.new
           }
         end

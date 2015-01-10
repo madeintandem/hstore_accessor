@@ -269,9 +269,16 @@ describe HstoreAccessor do
     if ::ActiveRecord::VERSION::STRING.to_f >= 4.2
       subject { Product }
 
+      context "default behavior" do
+        it "returns the type for the column" do
+          expect(subject.type_for_attribute("string_type")).to eq(ActiveRecord::Type::String.new)
+        end
+      end
+
       context "string" do
         it "returns the type" do
-          expect(subject.type_for_attribute("color")).to eq(ActiveRecord::Type::Value.new)
+          expect(subject.type_for_attribute("color")).to eq(ActiveRecord::Type::String.new)
+          expect(subject.type_for_attribute("color")).to eq(subject.type_for_attribute("string_type"))
         end
       end
 
@@ -303,6 +310,12 @@ describe HstoreAccessor do
         it "returns the type" do
           expect(subject.type_for_attribute("published")).to eq(ActiveRecord::Type::Boolean.new)
         end
+      end
+    else
+      subject { Product }
+
+      it "is not defined" do
+        expect(subject).to_not respond_to(:type_for_attribute)
       end
     end
   end
@@ -436,16 +449,15 @@ describe HstoreAccessor do
     end
 
     context "multipart values" do
-      if ::ActiveRecord::VERSION::STRING.to_f >= 4.2
-        it "stores multipart dates correctly" do
-          product.update_attributes!(
-            "released_at(1i)" => "2014",
-            "released_at(2i)" => "04",
-            "released_at(3i)" => "14"
-          )
-          product.reload
-          expect(product.released_at).to eq(Date.new(2014, 4, 14))
-        end
+      test_method = ::ActiveRecord::VERSION::STRING.to_f >= 4.2 ? :it : :xit
+      send test_method, "stores multipart dates correctly" do
+        product.update_attributes!(
+          "released_at(1i)" => "2014",
+          "released_at(2i)" => "04",
+          "released_at(3i)" => "14"
+        )
+        product.reload
+        expect(product.released_at).to eq(Date.new(2014, 4, 14))
       end
     end
 

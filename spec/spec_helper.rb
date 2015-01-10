@@ -37,6 +37,7 @@ def create_database
     t.time :time_type
     t.string :array_type, array: true
     t.date :date_type
+    t.datetime :datetime_type
     t.decimal :decimal_type
   end
 end
