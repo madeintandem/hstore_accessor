@@ -266,41 +266,43 @@ describe HstoreAccessor do
   end
 
   describe "#type_for_attribute" do
-    subject { Product }
+    if ::ActiveRecord::VERSION::STRING.to_f >= 4.2
+      subject { Product }
 
-    context "string" do
-      it "returns the type" do
-        expect(subject.type_for_attribute("color")).to eq(ActiveRecord::Type::Value.new)
+      context "string" do
+        it "returns the type" do
+          expect(subject.type_for_attribute("color")).to eq(ActiveRecord::Type::Value.new)
+        end
       end
-    end
 
-    context "integer" do
-      it "returns the type" do
-        expect(subject.type_for_attribute("price")).to eq(ActiveRecord::Type::Integer.new)
+      context "integer" do
+        it "returns the type" do
+          expect(subject.type_for_attribute("price")).to eq(ActiveRecord::Type::Integer.new)
+        end
       end
-    end
 
-    context "float" do
-      it "returns the type" do
-        expect(subject.type_for_attribute("weight")).to eq(ActiveRecord::Type::Float.new)
+      context "float" do
+        it "returns the type" do
+          expect(subject.type_for_attribute("weight")).to eq(ActiveRecord::Type::Float.new)
+        end
       end
-    end
 
-    context "time" do
-      it "returns the type" do
-        expect(subject.type_for_attribute("build_timestamp")).to eq(ActiveRecord::Type::DateTime.new)
+      context "time" do
+        it "returns the type" do
+          expect(subject.type_for_attribute("build_timestamp")).to eq(ActiveRecord::Type::DateTime.new)
+        end
       end
-    end
 
-    context "date" do
-      it "returns the type" do
-        expect(subject.type_for_attribute("released_at")).to eq(ActiveRecord::Type::Date.new)
+      context "date" do
+        it "returns the type" do
+          expect(subject.type_for_attribute("released_at")).to eq(ActiveRecord::Type::Date.new)
+        end
       end
-    end
 
-    context "boolean" do
-      it "returns the type" do
-        expect(subject.type_for_attribute("published")).to eq(ActiveRecord::Type::Boolean.new)
+      context "boolean" do
+        it "returns the type" do
+          expect(subject.type_for_attribute("published")).to eq(ActiveRecord::Type::Boolean.new)
+        end
       end
     end
   end
@@ -434,14 +436,16 @@ describe HstoreAccessor do
     end
 
     context "multipart values" do
-      it "stores multipart dates correctly" do
-        product.update_attributes!(
-          "released_at(1i)" => "2014",
-          "released_at(2i)" => "04",
-          "released_at(3i)" => "14"
-        )
-        product.reload
-        expect(product.released_at).to eq(Date.new(2014, 4, 14))
+      if ::ActiveRecord::VERSION::STRING.to_f >= 4.2
+        it "stores multipart dates correctly" do
+          product.update_attributes!(
+            "released_at(1i)" => "2014",
+            "released_at(2i)" => "04",
+            "released_at(3i)" => "14"
+          )
+          product.reload
+          expect(product.released_at).to eq(Date.new(2014, 4, 14))
+        end
       end
     end
 

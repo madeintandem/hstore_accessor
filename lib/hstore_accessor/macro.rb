@@ -64,7 +64,7 @@ module HstoreAccessor
           end
 
           field_methods.send(:define_method, "#{key}_was") do
-            (send(:attribute_was, hstore_attribute) || {})[key]
+            (send(:attribute_was, hstore_attribute.to_s) || {})[key.to_s]
           end
 
           field_methods.send(:define_method, "#{key}_change") do
