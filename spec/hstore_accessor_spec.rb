@@ -294,10 +294,9 @@ describe HstoreAccessor do
   end
 
   describe "#column_for_attribute" do
-    it_returns_the_properly_typed_column = "returns the properly typed column"
     if ActiveRecord::VERSION::STRING.to_f >= 4.2
 
-      shared_examples it_returns_the_properly_typed_column do |type, attribute_name, cast_type_class|
+      def self.it_returns_the_properly_typed_column(type, attribute_name, cast_type_class)
         context "#{type}" do
           subject { Product.column_for_attribute(attribute_name) }
           it "returns a column with a #{type} cast type" do
@@ -307,18 +306,18 @@ describe HstoreAccessor do
         end
       end
 
-      it_behaves_like it_returns_the_properly_typed_column, :string, :color, ActiveRecord::Type::String
-      it_behaves_like it_returns_the_properly_typed_column, :integer, :price, ActiveRecord::Type::Integer
-      it_behaves_like it_returns_the_properly_typed_column, :boolean, :published, ActiveRecord::Type::Boolean
-      it_behaves_like it_returns_the_properly_typed_column, :float, :weight, ActiveRecord::Type::Float
-      it_behaves_like it_returns_the_properly_typed_column, :datetime, :build_timestamp, ActiveRecord::Type::DateTime
-      it_behaves_like it_returns_the_properly_typed_column, :date, :released_at, ActiveRecord::Type::Date
-      it_behaves_like it_returns_the_properly_typed_column, :decimal, :miles, ActiveRecord::Type::Decimal
-      it_behaves_like it_returns_the_properly_typed_column, :array, :tags, ActiveRecord::Type::Value
-      it_behaves_like it_returns_the_properly_typed_column, :hash, :reviews, ActiveRecord::Type::Value
+      it_returns_the_properly_typed_column :string, :color, ActiveRecord::Type::String
+      it_returns_the_properly_typed_column :integer, :price, ActiveRecord::Type::Integer
+      it_returns_the_properly_typed_column :boolean, :published, ActiveRecord::Type::Boolean
+      it_returns_the_properly_typed_column :float, :weight, ActiveRecord::Type::Float
+      it_returns_the_properly_typed_column :datetime, :build_timestamp, ActiveRecord::Type::DateTime
+      it_returns_the_properly_typed_column :date, :released_at, ActiveRecord::Type::Date
+      it_returns_the_properly_typed_column :decimal, :miles, ActiveRecord::Type::Decimal
+      it_returns_the_properly_typed_column :array, :tags, ActiveRecord::Type::Value
+      it_returns_the_properly_typed_column :hash, :reviews, ActiveRecord::Type::Value
       it "returns actual array and hash type columns back"
     else
-      shared_examples it_returns_the_properly_typed_column do |hstore_type, attribute_name, active_record_type|
+      def self.it_returns_the_properly_typed_column(hstore_type, attribute_name, active_record_type)
         context "#{hstore_type}" do
           subject { Product.new.column_for_attribute(attribute_name) }
           it "returns a column with a #{hstore_type} cast type" do
@@ -328,13 +327,13 @@ describe HstoreAccessor do
         end
       end
 
-      it_behaves_like it_returns_the_properly_typed_column, :string, :color, :string
-      it_behaves_like it_returns_the_properly_typed_column, :integer, :price, :integer
-      it_behaves_like it_returns_the_properly_typed_column, :boolean, :published, :boolean
-      it_behaves_like it_returns_the_properly_typed_column, :float, :weight, :float
-      it_behaves_like it_returns_the_properly_typed_column, :time, :build_timestamp, :datetime
-      it_behaves_like it_returns_the_properly_typed_column, :date, :released_at, :date
-      it_behaves_like it_returns_the_properly_typed_column, :decimal, :miles, :decimal
+      it_returns_the_properly_typed_column :string, :color, :string
+      it_returns_the_properly_typed_column :integer, :price, :integer
+      it_returns_the_properly_typed_column :boolean, :published, :boolean
+      it_returns_the_properly_typed_column :float, :weight, :float
+      it_returns_the_properly_typed_column :time, :build_timestamp, :datetime
+      it_returns_the_properly_typed_column :date, :released_at, :date
+      it_returns_the_properly_typed_column :decimal, :miles, :decimal
       it "returns the proper type for array attributes"
     end
   end
