@@ -723,9 +723,16 @@ describe HstoreAccessor do
         allow(ActiveSupport::Deprecation).to receive(:warn)
       end
 
-      it "displays a deprecation warning" do
-        expect(ActiveSupport::Deprecation).to receive(:warn)
-        product.reset_color!
+      if ActiveRecord::VERSION::STRING.to_f >= 4.2
+        it "displays a deprecation warning" do
+          expect(ActiveSupport::Deprecation).to receive(:warn)
+          product.reset_color!
+        end
+      else
+        it "does not display a deprecation warning" do
+          expect(ActiveSupport::Deprecation).to_not receive(:warn)
+          product.reset_color!
+        end
       end
 
       it "restores the attribute" do
