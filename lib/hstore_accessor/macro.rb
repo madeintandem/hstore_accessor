@@ -61,7 +61,7 @@ module HstoreAccessor
 
           field_methods.send(:define_method, "#{key}=") do |value|
             casted_value = TypeHelpers.cast(data_type, value)
-            serialized_value = serialize(data_type, casted_value)
+            serialized_value = Serialization.serialize(data_type, casted_value)
 
             unless send(key) == casted_value
               send("#{hstore_attribute}_will_change!")
@@ -72,7 +72,7 @@ module HstoreAccessor
 
           field_methods.send(:define_method, key) do
             value = send(hstore_attribute) && send(hstore_attribute).with_indifferent_access[store_key.to_s]
-            deserialize(data_type, value)
+            Serialization.deserialize(data_type, value)
           end
 
           field_methods.send(:define_method, "#{key}?") do

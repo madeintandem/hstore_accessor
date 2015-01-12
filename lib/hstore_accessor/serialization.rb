@@ -33,16 +33,18 @@ module HstoreAccessor
     }
     DESERIALIZERS.default = DEFAULT_DESERIALIZER
 
-    def serialize(type, value, serializer=SERIALIZERS[type])
-      return nil if value.nil?
+    class << self
+      def serialize(type, value, serializer=SERIALIZERS[type])
+        return nil if value.nil?
 
-      serializer.call(value)
-    end
+        serializer.call(value)
+      end
 
-    def deserialize(type, value, deserializer=DESERIALIZERS[type])
-      return nil if value.nil?
+      def deserialize(type, value, deserializer=DESERIALIZERS[type])
+        return nil if value.nil?
 
-      deserializer.call(value)
+        deserializer.call(value)
+      end
     end
   end
 end
