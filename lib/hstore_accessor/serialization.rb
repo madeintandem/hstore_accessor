@@ -2,7 +2,7 @@ module HstoreAccessor
   module Serialization
     InvalidDataTypeError = Class.new(StandardError)
 
-    VALID_TYPES = [:string, :integer, :float, :time, :boolean, :array, :hash, :date, :decimal]
+    VALID_TYPES = [:string, :integer, :float, :datetime, :boolean, :array, :hash, :date, :decimal]
 
     DEFAULT_SERIALIZER = ->(value) { value.to_s }
     DEFAULT_DESERIALIZER = DEFAULT_SERIALIZER
@@ -17,7 +17,7 @@ module HstoreAccessor
           YAML.dump(value)
         end
       end,
-      time: -> value { value && value.to_i }
+      datetime: -> value { value && value.to_i }
     }
     SERIALIZERS.default = DEFAULT_SERIALIZER
 
@@ -29,7 +29,7 @@ module HstoreAccessor
       float: -> value { value && value.to_f },
       hash: -> value { value && YAML.load(value) },
       integer: -> value { value && value.to_i },
-      time: -> value { value && Time.at(value.to_i) }
+      datetime: -> value { value && Time.at(value.to_i) }
     }
     DESERIALIZERS.default = DEFAULT_DESERIALIZER
 

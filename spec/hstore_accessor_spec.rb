@@ -7,7 +7,7 @@ FIELDS = {
   published: { data_type: :boolean, store_key: "p" },
   weight: { data_type: :float, store_key: "w" },
   popular: :boolean,
-  build_timestamp: :time,
+  build_timestamp: :datetime,
   tags: :array,
   reviews: :hash,
   released_at: :date,
@@ -338,7 +338,7 @@ describe HstoreAccessor do
       it_behaves_like it_returns_the_properly_typed_column, :integer, :price, ActiveRecord::Type::Integer
       it_behaves_like it_returns_the_properly_typed_column, :boolean, :published, ActiveRecord::Type::Boolean
       it_behaves_like it_returns_the_properly_typed_column, :float, :weight, ActiveRecord::Type::Float
-      it_behaves_like it_returns_the_properly_typed_column, :time, :build_timestamp, ActiveRecord::Type::DateTime
+      it_behaves_like it_returns_the_properly_typed_column, :datetime, :build_timestamp, ActiveRecord::Type::DateTime
       it_behaves_like it_returns_the_properly_typed_column, :date, :released_at, ActiveRecord::Type::Date
       it_behaves_like it_returns_the_properly_typed_column, :decimal, :miles, ActiveRecord::Type::Decimal
       it_behaves_like it_returns_the_properly_typed_column, :array, :tags, ActiveRecord::Type::Value

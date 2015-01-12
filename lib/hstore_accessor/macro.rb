@@ -131,7 +131,7 @@ module HstoreAccessor
             send(:scope, "#{key}_eq", -> value { where("(#{query_field})::#{data_type} = ?", value.to_s) })
             send(:scope, "#{key}_gte", -> value { where("(#{query_field})::#{data_type} >= ?", value.to_s) })
             send(:scope, "#{key}_gt", -> value { where("(#{query_field})::#{data_type} > ?", value.to_s) })
-          when :time
+          when :datetime
             send(:scope, "#{key}_before", -> value { where("(#{query_field})::integer < ?", value.to_i) })
             send(:scope, "#{key}_eq", -> value { where(eq_query_field, value.to_i.to_s) })
             send(:scope, "#{key}_after", -> value { where("(#{query_field})::integer > ?", value.to_i) })

@@ -3,7 +3,7 @@ module HstoreAccessor
     if ::ActiveRecord::VERSION::STRING.to_f >= 4.2
       TYPES = {
         string: ActiveRecord::Type::String,
-        time: ActiveRecord::Type::DateTime,
+        datetime: ActiveRecord::Type::DateTime,
         date: ActiveRecord::Type::Date,
         float: ActiveRecord::Type::Float,
         boolean: ActiveRecord::Type::Boolean,
@@ -24,7 +24,7 @@ module HstoreAccessor
           case type
           when :string, :hash, :array, :decimal
             value
-          when :integer, :float, :time, :date, :boolean
+          when :integer, :float, :datetime, :date, :boolean
             types[type].new.type_cast_from_user(value)
           else value
             # Nothing.
@@ -38,7 +38,7 @@ module HstoreAccessor
     else
       TYPES = {
         string: "char",
-        time: "datetime",
+        datetime: "datetime",
         date: "date",
         float: "float",
         boolean: "boolean",
@@ -62,7 +62,7 @@ module HstoreAccessor
           column_class.value_to_integer(value)
         when :float
           value.to_f
-        when :time
+        when :datetime
           TimeHelper.string_to_time(value)
         when :date
           column_class.value_to_date(value)
