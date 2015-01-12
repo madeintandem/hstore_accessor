@@ -269,48 +269,21 @@ describe HstoreAccessor do
     if ::ActiveRecord::VERSION::STRING.to_f >= 4.2
       subject { Product }
 
-      context "default behavior" do
-        it "returns the type for the column" do
-          expect(subject.type_for_attribute("string_type")).to eq(ActiveRecord::Type::String.new)
+      def self.it_returns_the_type_for_the_attribute(type, attribute_name, active_record_type)
+        context "#{type}" do
+          it "returns the type for the column" do
+            expect(subject.type_for_attribute(attribute_name.to_s)).to eq(active_record_type.new)
+          end
         end
       end
 
-      context "string" do
-        it "returns the type" do
-          expect(subject.type_for_attribute("color")).to eq(ActiveRecord::Type::String.new)
-          expect(subject.type_for_attribute("color")).to eq(subject.type_for_attribute("string_type"))
-        end
-      end
-
-      context "integer" do
-        it "returns the type" do
-          expect(subject.type_for_attribute("price")).to eq(ActiveRecord::Type::Integer.new)
-        end
-      end
-
-      context "float" do
-        it "returns the type" do
-          expect(subject.type_for_attribute("weight")).to eq(ActiveRecord::Type::Float.new)
-        end
-      end
-
-      context "time" do
-        it "returns the type" do
-          expect(subject.type_for_attribute("build_timestamp")).to eq(ActiveRecord::Type::DateTime.new)
-        end
-      end
-
-      context "date" do
-        it "returns the type" do
-          expect(subject.type_for_attribute("released_at")).to eq(ActiveRecord::Type::Date.new)
-        end
-      end
-
-      context "boolean" do
-        it "returns the type" do
-          expect(subject.type_for_attribute("published")).to eq(ActiveRecord::Type::Boolean.new)
-        end
-      end
+      it_returns_the_type_for_the_attribute "default behavior", :string_type, ActiveRecord::Type::String
+      it_returns_the_type_for_the_attribute :string, :color, ActiveRecord::Type::String
+      it_returns_the_type_for_the_attribute :integer, :price, ActiveRecord::Type::Integer
+      it_returns_the_type_for_the_attribute :float, :weight, ActiveRecord::Type::Float
+      it_returns_the_type_for_the_attribute :datetime, :build_timestamp, ActiveRecord::Type::DateTime
+      it_returns_the_type_for_the_attribute :date, :released_at, ActiveRecord::Type::Date
+      it_returns_the_type_for_the_attribute :boolean, :published, ActiveRecord::Type::Boolean
     else
       subject { Product }
 
