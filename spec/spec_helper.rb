@@ -39,5 +39,6 @@ def create_database
     t.date :date_type
     t.datetime :datetime_type
     t.decimal :decimal_type
+    t.hstore :hash_type
   end
 end

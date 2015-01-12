@@ -320,6 +320,52 @@ describe HstoreAccessor do
     end
   end
 
+  describe "#column_for_attribute" do
+    it_returns_the_properly_typed_column = "returns the properly typed column"
+    if ActiveRecord::VERSION::STRING.to_f >= 4.2
+
+      shared_examples it_returns_the_properly_typed_column do |type, attribute_name, cast_type_class|
+        context "#{type}" do
+          subject { Product.column_for_attribute(attribute_name) }
+          it "returns a column with a #{type} cast type" do
+            expect(subject).to be_a(ActiveRecord::ConnectionAdapters::Column)
+            expect(subject.cast_type).to eq(cast_type_class.new)
+          end
+        end
+      end
+
+      it_behaves_like it_returns_the_properly_typed_column, :string, :color, ActiveRecord::Type::String
+      it_behaves_like it_returns_the_properly_typed_column, :integer, :price, ActiveRecord::Type::Integer
+      it_behaves_like it_returns_the_properly_typed_column, :boolean, :published, ActiveRecord::Type::Boolean
+      it_behaves_like it_returns_the_properly_typed_column, :float, :weight, ActiveRecord::Type::Float
+      it_behaves_like it_returns_the_properly_typed_column, :time, :build_timestamp, ActiveRecord::Type::DateTime
+      it_behaves_like it_returns_the_properly_typed_column, :date, :released_at, ActiveRecord::Type::Date
+      it_behaves_like it_returns_the_properly_typed_column, :decimal, :miles, ActiveRecord::Type::Decimal
+      it_behaves_like it_returns_the_properly_typed_column, :array, :tags, ActiveRecord::Type::Value
+      it_behaves_like it_returns_the_properly_typed_column, :hash, :reviews, ActiveRecord::Type::Value
+      it "returns actual array and hash type columns back"
+    else
+      shared_examples it_returns_the_properly_typed_column do |hstore_type, attribute_name, active_record_type|
+        context "#{hstore_type}" do
+          subject { Product.new.column_for_attribute(attribute_name) }
+          it "returns a column with a #{hstore_type} cast type" do
+            expect(subject).to be_a(ActiveRecord::ConnectionAdapters::Column)
+            expect(subject.type).to eq(active_record_type)
+          end
+        end
+      end
+
+      it_behaves_like it_returns_the_properly_typed_column, :string, :color, :string
+      it_behaves_like it_returns_the_properly_typed_column, :integer, :price, :integer
+      it_behaves_like it_returns_the_properly_typed_column, :boolean, :published, :boolean
+      it_behaves_like it_returns_the_properly_typed_column, :float, :weight, :float
+      it_behaves_like it_returns_the_properly_typed_column, :time, :build_timestamp, :datetime
+      it_behaves_like it_returns_the_properly_typed_column, :date, :released_at, :date
+      it_behaves_like it_returns_the_properly_typed_column, :decimal, :miles, :decimal
+      it "returns the proper type for array attributes"
+    end
+  end
+
   context "when assigning values it" do
     let(:product) { Product.new }
 
@@ -449,8 +495,7 @@ describe HstoreAccessor do
     end
 
     context "multipart values" do
-      test_method = ::ActiveRecord::VERSION::STRING.to_f >= 4.2 ? :it : :xit
-      send test_method, "stores multipart dates correctly" do
+      it "stores multipart dates correctly" do
         product.update_attributes!(
           "released_at(1i)" => "2014",
           "released_at(2i)" => "04",

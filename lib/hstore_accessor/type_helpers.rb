@@ -1,7 +1,23 @@
 module HstoreAccessor
   module TypeHelpers
     if ::ActiveRecord::VERSION::STRING.to_f >= 4.2
+      TYPES = {
+        string: ActiveRecord::Type::String,
+        time: ActiveRecord::Type::DateTime,
+        date: ActiveRecord::Type::Date,
+        float: ActiveRecord::Type::Float,
+        boolean: ActiveRecord::Type::Boolean,
+        decimal: ActiveRecord::Type::Decimal,
+        integer: ActiveRecord::Type::Integer,
+        hash: ActiveRecord::Type::Value,
+        array: ActiveRecord::Type::Value
+      }
+
       class << self
+        def column_type_for(attribute, data_type)
+          ActiveRecord::ConnectionAdapters::Column.new(attribute.to_s, nil, types[data_type].new)
+        end
+
         def cast(type, value)
           return nil if value.nil?
 
@@ -9,24 +25,31 @@ module HstoreAccessor
           when :string, :hash, :array, :decimal
             value
           when :integer, :float, :time, :date, :boolean
-            types[type].type_cast_from_user(value)
+            types[type].new.type_cast_from_user(value)
           else value
             # Nothing.
           end
         end
 
         def types
-          {
-            integer: ::ActiveRecord::Type::Integer.new,
-            float: ::ActiveRecord::Type::Float.new,
-            time: ::ActiveRecord::Type::DateTime.new,
-            date: ::ActiveRecord::Type::Date.new,
-            string: ::ActiveRecord::Type::String.new,
-            boolean: ::ActiveRecord::Type::Boolean.new
-          }
+          TYPES
         end
       end
     else
+      TYPES = {
+        string: "char",
+        time: "datetime",
+        date: "date",
+        float: "float",
+        boolean: "boolean",
+        decimal: "decimal",
+        integer: "int"
+      }
+
+      def self.column_type_for(attribute, data_type)
+        ActiveRecord::ConnectionAdapters::Column.new(attribute.to_s, nil, TYPES[data_type])
+      end
+
       def self.cast(type, value)
         return nil if value.nil?
 
