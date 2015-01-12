@@ -23,9 +23,7 @@ module HstoreAccessor
               super(attribute)
             end
           end
-        end
 
-        if ::ActiveRecord::VERSION::STRING.to_f >= 4.2
           singleton_class.send(:define_method, :column_for_attribute) do |attribute|
             data_type = @hstore_keys_and_types[attribute.to_s]
             if data_type
