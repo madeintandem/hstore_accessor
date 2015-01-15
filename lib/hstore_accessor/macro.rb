@@ -59,58 +59,60 @@ module HstoreAccessor
 
           @hstore_keys_and_types[key.to_s] = data_type
 
-          field_methods.send(:define_method, "#{key}=") do |value|
-            casted_value = TypeHelpers.cast(data_type, value)
-            serialized_value = Serialization.serialize(data_type, casted_value)
+          field_methods.instance_eval do
+            define_method("#{key}=") do |value|
+              casted_value = TypeHelpers.cast(data_type, value)
+              serialized_value = Serialization.serialize(data_type, casted_value)
 
-            unless send(key) == casted_value
+              unless send(key) == casted_value
+                send("#{hstore_attribute}_will_change!")
+              end
+
+              send("#{hstore_attribute}=", (send(hstore_attribute) || {}).merge(store_key.to_s => serialized_value))
+            end
+
+            define_method(key) do
+              value = send(hstore_attribute) && send(hstore_attribute).with_indifferent_access[store_key.to_s]
+              Serialization.deserialize(data_type, value)
+            end
+
+            define_method("#{key}?") do
+              send("#{key}").present?
+            end
+
+            define_method("#{key}_changed?") do
+              send("#{key}_change").present?
+            end
+
+            define_method("#{key}_was") do
+              (send(:attribute_was, hstore_attribute.to_s) || {})[key.to_s]
+            end
+
+            define_method("#{key}_change") do
+              hstore_changes = send("#{hstore_attribute}_change")
+              return if hstore_changes.nil?
+              attribute_changes = hstore_changes.map { |change| change.try(:[], key.to_s) }
+              attribute_changes.compact.present? ? attribute_changes : nil
+            end
+
+            define_method("restore_#{key}!") do
+              old_hstore = send("#{hstore_attribute}_change").try(:first) || {}
+              send("#{key}=", old_hstore[key.to_s])
+            end
+
+            define_method("reset_#{key}!") do
+              if ActiveRecord::VERSION::STRING.to_f >= 4.2
+                ActiveSupport::Deprecation.warn(<<-MSG.squish)
+                  `#reset_#{key}!` is deprecated and will be removed on Rails 5.
+                  Please use `#restore_#{key}!` instead.
+                MSG
+              end
+              send("restore_#{key}!")
+            end
+
+            define_method("#{key}_will_change!") do
               send("#{hstore_attribute}_will_change!")
             end
-
-            send("#{hstore_attribute}=", (send(hstore_attribute) || {}).merge(store_key.to_s => serialized_value))
-          end
-
-          field_methods.send(:define_method, key) do
-            value = send(hstore_attribute) && send(hstore_attribute).with_indifferent_access[store_key.to_s]
-            Serialization.deserialize(data_type, value)
-          end
-
-          field_methods.send(:define_method, "#{key}?") do
-            send("#{key}").present?
-          end
-
-          field_methods.send(:define_method, "#{key}_changed?") do
-            send("#{key}_change").present?
-          end
-
-          field_methods.send(:define_method, "#{key}_was") do
-            (send(:attribute_was, hstore_attribute.to_s) || {})[key.to_s]
-          end
-
-          field_methods.send(:define_method, "#{key}_change") do
-            hstore_changes = send("#{hstore_attribute}_change")
-            return if hstore_changes.nil?
-            attribute_changes = hstore_changes.map { |change| change.try(:[], key.to_s) }
-            attribute_changes.compact.present? ? attribute_changes : nil
-          end
-
-          field_methods.send(:define_method, "restore_#{key}!") do
-            old_hstore = send("#{hstore_attribute}_change").try(:first) || {}
-            send("#{key}=", old_hstore[key.to_s])
-          end
-
-          field_methods.send(:define_method, "reset_#{key}!") do
-            if ActiveRecord::VERSION::STRING.to_f >= 4.2
-              ActiveSupport::Deprecation.warn(<<-MSG.squish)
-                `#reset_#{key}!` is deprecated and will be removed on Rails 5.
-                Please use `#restore_#{key}!` instead.
-              MSG
-            end
-            send("restore_#{key}!")
-          end
-
-          field_methods.send(:define_method, "#{key}_will_change!") do
-            send("#{hstore_attribute}_will_change!")
           end
 
           query_field = "#{hstore_attribute} -> '#{store_key}'"
