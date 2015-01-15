@@ -33,6 +33,8 @@ module HstoreAccessor
     }
     DESERIALIZERS.default = DEFAULT_DESERIALIZER
 
+    OLD_SEPARATOR = "||;||"
+
     class << self
       def serialize(type, value, serializer=SERIALIZERS[type])
         return nil if value.nil?
@@ -44,6 +46,16 @@ module HstoreAccessor
         return nil if value.nil?
 
         deserializer.call(value)
+      end
+
+      def migrate_array(old_array)
+        return if old_array.nil?
+        SERIALIZERS[:array].call(old_array.split(OLD_SEPARATOR))
+      end
+
+      def migrate_hash(old_hash)
+        return if old_hash.nil?
+        SERIALIZERS[:hash].call(JSON.parse(old_hash))
       end
     end
   end
