@@ -91,7 +91,7 @@ module HstoreAccessor
             define_method("#{key}_change") do
               hstore_changes = send("#{hstore_attribute}_change")
               return if hstore_changes.nil?
-              attribute_changes = hstore_changes.map { |change| change.try(:[], key.to_s) }
+              attribute_changes = hstore_changes.map { |change| change.try(:[], store_key.to_s) }
               attribute_changes.compact.present? ? attribute_changes : nil
             end
 
