@@ -499,8 +499,9 @@ describe HstoreAccessor do
         product.build_timestamp = timestamp
         product.save
         product.reload
-        Time.zone = other_zone
-        expect(product.build_timestamp.utc_offset).to eq other_zone.utc_offset
+        Time.use_zone(other_zone) do
+          expect(product.build_timestamp.utc_offset).to eq other_zone.utc_offset
+        end
       end
     end
 
