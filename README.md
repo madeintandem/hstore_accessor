@@ -226,6 +226,7 @@ post](http://www.devmynd.com/blog/2013-3-single-table-inheritance-hstore-lovely-
 1. [Fork it](https://github.com/devmynd/hstore_accessor/fork)
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Write code _and_ tests
-4. Commit your changes (`git commit -am 'Add some feature'`)
-5. Push to the branch (`git push origin my-new-feature`)
-6. Create new Pull Request
+4. Run the tests with `appraisal rspec` (be sure to `appraisal install` first)
+5. Commit your changes (`git commit -am 'Add some feature'`)
+6. Push to the branch (`git push origin my-new-feature`)
+7. Create new Pull Request
