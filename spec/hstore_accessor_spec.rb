@@ -664,7 +664,12 @@ describe HstoreAccessor do
         product.color = "GREEN"
         expect(product.color_change).to eq %w(ORANGE GREEN)
       end
-
+      context "when store_key differs from key" do
+        it "returns the old and new values" do
+          product.weight = 100.01
+          expect(product.weight_change[1]).to eq "100.01"
+        end
+      end
       context "hstore attribute was nil" do
         it "returns old and new values" do
           product.options = nil
