@@ -315,7 +315,6 @@ describe HstoreAccessor do
       it_returns_the_properly_typed_column :decimal, :miles, ActiveRecord::Type::Decimal
       it_returns_the_properly_typed_column :array, :tags, ActiveRecord::Type::Value
       it_returns_the_properly_typed_column :hash, :reviews, ActiveRecord::Type::Value
-      it "returns actual array and hash type columns back"
     else
       def self.it_returns_the_properly_typed_column(hstore_type, attribute_name, active_record_type)
         context "#{hstore_type}" do
@@ -334,7 +333,6 @@ describe HstoreAccessor do
       it_returns_the_properly_typed_column :time, :build_timestamp, :datetime
       it_returns_the_properly_typed_column :date, :released_at, :date
       it_returns_the_properly_typed_column :decimal, :miles, :decimal
-      it "returns the proper type for array attributes"
     end
   end
 
