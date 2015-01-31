@@ -77,7 +77,7 @@ module HstoreAccessor
             end
 
             define_method("#{key}?") do
-              send("#{key}").present?
+              send(key).present?
             end
 
             define_method("#{key}_changed?") do
