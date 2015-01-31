@@ -477,28 +477,32 @@ describe HstoreAccessor do
     end
 
     context "time values" do
-      let(:other_zone){(ActiveSupport::TimeZone.all - Array(Time.zone)).sample}
+      let(:chicago_timezone) { ActiveSupport::TimeZone["America/Chicago"] }
+      let(:new_york_timezone) { ActiveSupport::TimeZone["America/New_York"] }
+
       it "correctly stores value" do
         timestamp = Time.now - 10.days
         product.build_timestamp = timestamp
-        product.save
+        product.save!
         product.reload
         expect(product.build_timestamp.to_i).to eq timestamp.to_i
       end
 
       it "stores the value in utc" do
-        timestamp = Time.now.in_time_zone(other_zone) - 10.days
+        timestamp = Time.now.in_time_zone(chicago_timezone) - 10.days
         product.build_timestamp = timestamp
-        expect(product.options['build_timestamp'].to_i).to eq timestamp.utc.to_i
+        product.save!
+        product.reload
+        expect(product.options["build_timestamp"].to_i).to eq timestamp.utc.to_i
       end
 
       it "returns the time value in the current time zone" do
-        timestamp = Time.now - 10.days
+        timestamp = Time.now.in_time_zone(chicago_timezone) - 10.days
         product.build_timestamp = timestamp
-        product.save
+        product.save!
         product.reload
-        Time.use_zone(other_zone) do
-          expect(product.build_timestamp.utc_offset).to eq other_zone.utc_offset
+        Time.use_zone(new_york_timezone) do
+          expect(product.build_timestamp.utc_offset).to eq new_york_timezone.utc_offset
         end
       end
     end
