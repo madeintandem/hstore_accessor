@@ -31,5 +31,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rubocop"
   spec.add_development_dependency "shoulda-matchers"
 
-  spec.post_install_message = "Please note that there are breaking changes in version 1.0.0! Refer to the changelog here...\nhttps://github.com/devmynd/hstore_accessor#changelog"
+  spec.post_install_message = "Please note that the `array` and `hash` types will no longer be supported in version 1.0.0"
 end
