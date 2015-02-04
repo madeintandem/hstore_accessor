@@ -1,16 +1,16 @@
 module HstoreAccessor
   module TypeHelpers
     TYPES = {
-      string: ActiveRecord::Type::String,
-      datetime: ActiveRecord::Type::DateTime,
-      date: ActiveRecord::Type::Date,
-      float: ActiveRecord::Type::Float,
       boolean: ActiveRecord::Type::Boolean,
+      date: ActiveRecord::Type::Date,
+      datetime: ActiveRecord::Type::DateTime,
       decimal: ActiveRecord::Type::Decimal,
+      float: ActiveRecord::Type::Float,
       integer: ActiveRecord::Type::Integer,
-      hash: ActiveRecord::Type::Value,
-      array: ActiveRecord::Type::Value
+      string: ActiveRecord::Type::String
     }
+
+    TYPES.default = ActiveRecord::Type::Value
 
     class << self
       def column_type_for(attribute, data_type)

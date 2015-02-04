@@ -18,7 +18,7 @@ module HstoreAccessor
           singleton_class.send(:define_method, :type_for_attribute) do |attribute|
             data_type = @hstore_keys_and_types[attribute]
             if data_type
-              TypeHelpers::TYPES[data_type].new || ActiveRecord::Type::Value.new
+              TypeHelpers::TYPES[data_type].new
             else
               super(attribute)
             end
