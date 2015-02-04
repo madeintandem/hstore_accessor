@@ -224,6 +224,13 @@ describe HstoreAccessor do
       it "equality" do
         expect(Product.tags_eq(%w(tag1 tag2 tag3)).to_a).to eq [product_a]
       end
+
+      it "contains" do
+        expect(Product.tags_contains("tag2").to_a).to eq [product_a, product_b]
+        expect(Product.tags_contains(%w(tag2 tag3)).to_a).to eq [product_a, product_b]
+        expect(Product.tags_contains(%w(tag1 tag2 tag3)).to_a).to eq [product_a]
+        expect(Product.tags_contains(%w(tag1 tag2 tag3 tag4)).to_a).to eq []
+      end
     end
 
     context "for time fields support" do
@@ -392,27 +399,6 @@ describe HstoreAccessor do
         product.reload
         expect(product.tags).to eq ["household", "living room", "kitchen"]
       end
-
-      it "correctly stores integers" do
-        product.tags = [1, 2, "3"]
-        product.save
-        product.reload
-        expect(product.tags).to eq [1, 2, "3"]
-      end
-
-      it "correctly stores hashes" do
-        product.tags = [{ foo: "bar" }, { "baz" => 123 }]
-        product.save
-        product.reload
-        expect(product.tags).to eq [{ foo: "bar" }, { "baz" => 123 }]
-      end
-
-      it "correctly stores non-arrays as array wrapped objects" do
-        product.tags = "bar"
-        product.save
-        product.reload
-        expect(product.tags).to eq ["bar"]
-      end
     end
 
     context "hash values" do
@@ -423,44 +409,12 @@ describe HstoreAccessor do
         expect(product.reviews).to be_nil
       end
 
-      it "correctly stores stringy-keyed hash values" do
-        product.reviews = { "user_123" => "4 stars", "user_994" => "3 stars" }
+      it "correctly stores hash values as json" do
+        hash = product.reviews = { "user_123" => "4 stars", "user_994" => "3 stars" }
         product.save
         product.reload
         expect(product.reviews).to eq("user_123" => "4 stars", "user_994" => "3 stars")
-      end
-
-      it "correctly stores a variety of hash values" do
-        product.reviews = { "user_123" => [1, 2], "user_994" => "stringy", foo: :bar, baz: 1, zoo: "zaz", hashy: { test: 1 } }
-        product.save
-        product.reload
-        expect(product.reviews).to eq("user_123" => [1, 2], "user_994" => "stringy", foo: :bar, baz: 1, zoo: "zaz", hashy: { test: 1 })
-      end
-
-      it "correctly stores an object" do
-        class Stuff
-          attr_accessor :thing
-        end
-
-        stuff = Stuff.new
-        stuff.thing = "1"
-
-        product.reviews = { "stuff" => stuff }
-        product.save
-        product.reload
-
-        expect(product.reviews["stuff"].thing).to eq(stuff.thing)
-
-        Object.send(:remove_const, :Stuff)
-        product.reload
-
-        expect { product.reviews }.to raise_error
-      end
-
-      it "raises an exception when trying to store a non-hash value" do
-        expect do
-          product.reviews = "hello"
-        end.to raise_error(HstoreAccessor::Serialization::InvalidDataTypeError)
+        expect(product.options["reviews"]).to eq(hash.to_json)
       end
     end
 

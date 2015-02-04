@@ -145,7 +145,8 @@ module HstoreAccessor
             send(:scope, "is_#{key}", -> { where(eq_query_field, "true") })
             send(:scope, "not_#{key}", -> { where(eq_query_field, "false") })
           when :array
-            send(:scope, "#{key}_eq", -> value { where("#{query_field} = ?", YAML.dump(Array.wrap(value))) })
+            send(:scope, "#{key}_eq", -> value { where("#{query_field} = ?", value.join(Serialization::SEPARATOR)) })
+            send(:scope, "#{key}_contains", -> value { where("string_to_array(#{query_field}, '#{Serialization::SEPARATOR}') @> string_to_array(?, '#{Serialization::SEPARATOR}')", Array[value].flatten.join(Serialization::SEPARATOR)) })
           end
         end
 

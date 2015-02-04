@@ -2,32 +2,39 @@ module HstoreAccessor
   module Serialization
     InvalidDataTypeError = Class.new(StandardError)
 
-    VALID_TYPES = [:string, :integer, :float, :datetime, :boolean, :array, :hash, :date, :decimal]
+    VALID_TYPES = [
+      :array,
+      :boolean,
+      :date,
+      :datetime,
+      :decimal,
+      :float,
+      :hash,
+      :integer,
+      :string
+    ]
 
     DEFAULT_SERIALIZER = ->(value) { value.to_s }
     DEFAULT_DESERIALIZER = DEFAULT_SERIALIZER
 
+    SEPARATOR = "||;||"
+
     SERIALIZERS = {
-      array: -> value { value && YAML.dump(Array.wrap(value)) },
+      array: -> value { (value && value.join(SEPARATOR)) || nil },
       boolean: -> value { (value.to_s == "true").to_s },
       date: -> value { value && value.to_s },
-      hash: lambda do |value|
-        if value
-          raise InvalidDataTypeError, "Cannot serialize a non-hash value into the hash typed attribute" unless value.is_a?(Hash)
-          YAML.dump(value)
-        end
-      end,
+      hash: -> value { (value && value.to_json) || nil },
       datetime: -> value { value && value.to_i }
     }
     SERIALIZERS.default = DEFAULT_SERIALIZER
 
     DESERIALIZERS = {
-      array: -> value { value && YAML.load(value) },
+      array: -> value { (value && value.split(SEPARATOR)) || nil },
       boolean: -> value { TypeHelpers.cast(:boolean, value) },
       date: -> value { value && Date.parse(value) },
       decimal: -> value { value && BigDecimal.new(value) },
       float: -> value { value && value.to_f },
-      hash: -> value { value && YAML.load(value) },
+      hash: -> value { (value && JSON.parse(value)) || nil },
       integer: -> value { value && value.to_i },
       datetime: -> value { value && Time.at(value.to_i).in_time_zone }
     }
