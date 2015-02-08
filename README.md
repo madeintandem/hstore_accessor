@@ -2,7 +2,7 @@
 
 # HstoreAccessor
 
-Hstore Accessor allows you to treat fields on an hstore column as though they were actual columns being picked up by ActiveRecord. This is especially handy when trying to avoid sparse columns while making use of [single table inheritence](#single-table-inheritance).
+Hstore Accessor allows you to treat fields on an hstore column as though they were actual columns being picked up by ActiveRecord. This is especially handy when trying to avoid sparse columns while making use of [single table inheritence](#single-table-inheritance). Hstore Accessor currently supports ActiveRecord versions 4.0, 4.1, and 4.2.
 
 ## Table of Contents
 
@@ -18,6 +18,8 @@ Hstore Accessor allows you to treat fields on an hstore column as though they we
   * [Boolean Fields](#boolean-fields)
 * [Single Table Inheritence](#single-table-inheritance)
 * [Contributing](#contributing)
+  - [Basics](#basics)
+  - [Developing Locally](#developing-locally)
 
 ## Installation
 
@@ -255,11 +257,19 @@ This approach was originally concieved by Joe Hirn in [this blog
 post](http://www.devmynd.com/blog/2013-3-single-table-inheritance-hstore-lovely-combination).
 
 ## Contributing
-
-1. [Fork it](https://github.com/devmynd/hstore_accessor/fork)
+### Basics
+1. [Fork it](https://github.com/devmynd/hstore_accessor/fork) 
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Write code _and_ tests
-4. Run the tests with `appraisal rspec` (be sure to `appraisal install` first)
-5. Commit your changes (`git commit -am 'Add some feature'`)
-6. Push to the branch (`git push origin my-new-feature`)
-7. Create new Pull Request
+4. Commit your changes (`git commit -am 'Add some feature'`)
+5. Push to the branch (`git push origin my-new-feature`)
+6. Create new Pull Request
+
+### Developing Locally
+Before you make your pull requests, please make sure you style is in line with our Rubocop settings and that all of the tests pass.
+
+1. `bundle install`
+2. `appraisal install`
+3. Make sure Postgres is installed and running
+4. `appraisal rspec` to run all the tests
+5. `rubocop` to check for style
