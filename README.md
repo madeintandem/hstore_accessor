@@ -2,17 +2,30 @@
 
 # HstoreAccessor
 
-PostgreSQL provides an hstore data type for storing arbitrarily complex
-structures in a column.  ActiveRecord 4.0 supports Hstore but casts all
-values in the store to a string.  Further, ActiveRecord does not provide
-discrete fields to access values directly in the hstore column.  The
-HstoreAccessor gem solves both of these issues.
+Hstore Accessor allows you to treat fields on an hstore column as though they were actual columns being picked up by ActiveRecord. This is especially handy when trying to avoid sparse columns while making use of [single table inheritence](#single-table-inheritance).
+
+## Table of Contents
+
+* [Installation](#installation)
+* [Setup](#setup)
+* [ActiveRecord methods generated for fields](#activerecord-methods-generated-for-fields)
+* [Scopes](#scopes)
+  * [String Fields](#string-fields)
+  * [Integer, Float, and Decimal Fields](#integer-float-decimal-fields)
+  * [Datetime Fields](#datetime-fields)
+  * [Date Fields](#date-fields)
+  * [Array Fields](#array-fields)
+  * [Boolean Fields](#boolean-fields)
+* [Single Table Inheritence](#single-table-inheritance)
+* [Contributing](#contributing)
 
 ## Installation
 
 Add this line to your application's Gemfile:
 
-    gem "hstore_accessor"
+```ruby
+gem "hstore_accessor"
+```
 
 And then execute:
 
@@ -22,14 +35,12 @@ Or install it yourself as:
 
     $ gem install hstore_accessor
 
-## Usage
-
-### Setup
+## Setup
 
 The `hstore_accessor` method accepts the name of the hstore column you'd
 like to use and a hash with keys representing fields and values
 indicating the type to be stored in that field.  The available types
-are: `string`, `integer`, `float`, `decimal`, `time`, `date`, `boolean`, `array`, and `hash`.
+are: `string`, `integer`, `float`, `decimal`, `time`, `date`, `boolean`, `array`, and `hash`. It is available on an class that inherits from `ActiveRecord::Base`.
 
 ```ruby
 class Product < ActiveRecord::Base
@@ -48,23 +59,23 @@ end
 Now you can interact with the fields stored in the hstore directly.
 
 ```ruby
-p = Product.new
-p.color = "green"
-p.weight = 34
-p.price = 99.95
-p.built_at = Time.now - 10.days
-p.build_date = Date.today
-p.popular = true
-p.tags = %w(housewares kitchen)
-p.ratings = { user_a: 3, user_b: 4 }
-p.miles = 3.14
+product = Product.new
+product.color = "green"
+product.weight = 34
+product.price = 99.95
+product.built_at = Time.now - 10.days
+product.build_date = Date.today
+product.popular = true
+product.tags = %w(housewares kitchen)
+product.ratings = { user_a: 3, user_b: 4 }
+product.miles = 3.14
 ```
 
 Reading these fields works as well.
 
 ```ruby
-p.color # => "green"
-p.tags  # => ["housewares", "kitchen"]
+product.color # => "green"
+product.tags  # => ["housewares", "kitchen"]
 ```
 
 In order to reduce the storage overhead of hstore keys (especially when
@@ -84,20 +95,42 @@ Additionally, dirty tracking is implemented in the same way that normal
 `ActiveRecord` fields work.
 
 ```ruby
-p.color          #=> "green"
-p.color = "blue"
-p.changed?       #=> true
-p.color_changed? #=> true
-p.color_was      #=> "green"
-p.color_changes  #=> ["green", "blue"]
+product.color          #=> "green"
+product.color = "blue"
+product.changed?       #=> true
+product.color_changed? #=> true
+product.color_was      #=> "green"
+product.color_changes  #=> ["green", "blue"]
 ```
 
-### Scopes
+## ActiveRecord methods generated for fields
+
+```ruby
+class Product < ActiveRecord::Base
+  hstore_accessor :data, field: :string
+end
+```
+
+* `field`
+* `field=`
+* `field?`
+* `field_changed?`
+* `field_was`
+* `field_change`
+* `reset_field!`
+* `restore_field!`
+* `field_will_change!`
+
+Overriding methods is supported, with access to the original Hstore Accessor implementation available via `super`.
+
+Additionally, there is also `hstore_metadata_for_<fields>` on both the class and instances. `column_for_attribute` will also return a column object for an Hstore Accessor defined field. If you're using ActiveRecord 4.2, `type_for_attribute` will return a type object for Hstore Accessor defined fields the same as it does for actual columns. 
+
+## Scopes
 
 The `hstore_accessor` macro also creates scopes for `string`, `integer`,
 `float`, `decimal`, `time`, `date`, `boolean`, and `array` fields.
 
-#### String Fields
+### String Fields
 
 For `string` types, a `with_<key>` scope is created which checks for
 equality.
@@ -106,7 +139,7 @@ equality.
 Product.with_color("green")
 ```
 
-#### Integer, Float, Decimal Fields
+### Integer, Float, Decimal Fields
 
 For `integer`, `float` and `decimal` types five scopes are created:
 
@@ -118,7 +151,7 @@ Product.price_gte(240.00) # price greater than or equal to
 Product.price_gt(240.00)  # price greater than
 ```
 
-#### Time Fields
+### Time Fields
 
 For `time` fields, three scopes are created:
 
@@ -128,7 +161,7 @@ Product.built_at_eq(Time.now - 10.days)   # built at an exact time
 Product.built_at_after(Time.now - 4.days) # built after the given time
 ```
 
-#### Date Fields
+### Date Fields
 
 For `date` fields, three scopes are created:
 
@@ -138,7 +171,7 @@ Product.build_date_eq(Date.today - 10.days)   # built at an exact date
 Product.built_date_after(Date.today - 4.days) # built after the given date
 ```
 
-#### Array Fields
+### Array Fields
 
 For `array` types, two scopes are created:
 
@@ -148,7 +181,7 @@ Product.tags_contains("kitchen")              # tags containing a single value
 Product.tags_contains(%w(housewares kitchen)) # tags containing a number of values
 ```
 
-#### Boolean Fields
+### Boolean Fields
 
 Two scopes are created for `boolean` fields:
 
