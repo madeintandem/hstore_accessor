@@ -6,8 +6,8 @@ require "hstore_accessor/version"
 Gem::Specification.new do |spec|
   spec.name          = "hstore_accessor"
   spec.version       = HstoreAccessor::VERSION
-  spec.authors       = ["Joe Hirn", "Cory Stephenson", "JC Grubbs", "Tony Coconate"]
-  spec.email         = ["joe@devmynd.com", "cory@devmynd.com", "jc@devmynd.com", "me@tonycoconate.com"]
+  spec.authors       = ["Joe Hirn", "Cory Stephenson", "JC Grubbs", "Tony Coconate", "Michael Crismali"]
+  spec.email         = ["joe@devmynd.com", "cory@devmynd.com", "jc@devmynd.com", "me@tonycoconate.com", "michael@devmynd.com"]
   spec.description   = "Adds typed hstore backed fields to an ActiveRecord model."
   spec.summary       = "Adds typed hstore backed fields to an ActiveRecord model."
   spec.homepage      = "http://github.com/devmynd/hstore_accessor"
