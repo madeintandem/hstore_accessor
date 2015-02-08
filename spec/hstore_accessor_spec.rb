@@ -23,6 +23,9 @@ class Product < ActiveRecord::Base
   hstore_accessor :data, DATA_FIELDS
 end
 
+class SuperProduct < Product
+end
+
 describe HstoreAccessor do
   context "macro" do
     let(:product) { Product.new }
@@ -274,7 +277,7 @@ describe HstoreAccessor do
 
   describe "#type_for_attribute" do
     if ::ActiveRecord::VERSION::STRING.to_f >= 4.2
-      subject { Product }
+      subject { SuperProduct }
 
       def self.it_returns_the_type_for_the_attribute(type, attribute_name, active_record_type)
         context "#{type}" do
@@ -305,7 +308,7 @@ describe HstoreAccessor do
 
       def self.it_returns_the_properly_typed_column(type, attribute_name, cast_type_class)
         context "#{type}" do
-          subject { Product.column_for_attribute(attribute_name) }
+          subject { SuperProduct.column_for_attribute(attribute_name) }
           it "returns a column with a #{type} cast type" do
             expect(subject).to be_a(ActiveRecord::ConnectionAdapters::Column)
             expect(subject.cast_type).to eq(cast_type_class.new)
@@ -325,7 +328,7 @@ describe HstoreAccessor do
     else
       def self.it_returns_the_properly_typed_column(hstore_type, attribute_name, active_record_type)
         context "#{hstore_type}" do
-          subject { Product.new.column_for_attribute(attribute_name) }
+          subject { SuperProduct.new.column_for_attribute(attribute_name) }
           it "returns a column with a #{hstore_type} cast type" do
             expect(subject).to be_a(ActiveRecord::ConnectionAdapters::Column)
             expect(subject.type).to eq(active_record_type)

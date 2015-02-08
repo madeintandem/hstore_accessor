@@ -2,7 +2,7 @@ module HstoreAccessor
   module Macro
     module ClassMethods
       def hstore_accessor(hstore_attribute, fields)
-        @hstore_keys_and_types ||= {}
+        @@hstore_keys_and_types ||= {}
 
         "hstore_metadata_for_#{hstore_attribute}".tap do |method_name|
           singleton_class.send(:define_method, method_name) do
@@ -16,7 +16,7 @@ module HstoreAccessor
 
         if ActiveRecord::VERSION::STRING.to_f >= 4.2
           singleton_class.send(:define_method, :type_for_attribute) do |attribute|
-            data_type = @hstore_keys_and_types[attribute]
+            data_type = @@hstore_keys_and_types[attribute]
             if data_type
               TypeHelpers::TYPES[data_type].new
             else
@@ -25,7 +25,7 @@ module HstoreAccessor
           end
 
           singleton_class.send(:define_method, :column_for_attribute) do |attribute|
-            data_type = @hstore_keys_and_types[attribute.to_s]
+            data_type = @@hstore_keys_and_types[attribute.to_s]
             if data_type
               TypeHelpers.column_type_for(attribute.to_s, data_type)
             else
@@ -34,7 +34,7 @@ module HstoreAccessor
           end
         else
           field_methods.send(:define_method, :column_for_attribute) do |attribute|
-            data_type = self.class.instance_eval { @hstore_keys_and_types }[attribute.to_s]
+            data_type = @@hstore_keys_and_types[attribute.to_s]
             if data_type
               TypeHelpers.column_type_for(attribute.to_s, data_type)
             else
@@ -57,7 +57,7 @@ module HstoreAccessor
 
           raise Serialization::InvalidDataTypeError unless Serialization::VALID_TYPES.include?(data_type)
 
-          @hstore_keys_and_types[key.to_s] = data_type
+          @@hstore_keys_and_types[key.to_s] = data_type
 
           field_methods.instance_eval do
             define_method("#{key}=") do |value|
