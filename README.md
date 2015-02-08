@@ -103,7 +103,7 @@ product.color = "blue"
 product.changed?       #=> true
 product.color_changed? #=> true
 product.color_was      #=> "green"
-product.color_changes  #=> ["green", "blue"]
+product.color_change  #=> ["green", "blue"]
 ```
 
 ## ActiveRecord methods generated for fields
