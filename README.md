@@ -17,6 +17,7 @@ Hstore Accessor allows you to treat fields on an hstore column as though they we
   * [Array Fields](#array-fields)
   * [Boolean Fields](#boolean-fields)
 * [Single Table Inheritence](#single-table-inheritance)
+* [Upgrading](#upgrading)
 * [Contributing](#contributing)
   - [Basics](#basics)
   - [Developing Locally](#developing-locally)
@@ -255,6 +256,16 @@ individual fields in an `hstore` column.
 
 This approach was originally concieved by Joe Hirn in [this blog
 post](http://www.devmynd.com/blog/2013-3-single-table-inheritance-hstore-lovely-combination).
+
+## Upgrading
+Upgrading from version 0.6 to 0.9 should be fairly painless. If you were previously using a `time` type fields, simply change it to `datetime` like so:
+
+```ruby
+# Before...
+hstore_accessor :data, published_at: :time
+# After...
+hstore_accessor :data, published_at: :datetime
+```
 
 ## Contributing
 ### Basics
