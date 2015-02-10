@@ -21,7 +21,7 @@ module HstoreAccessor
         return nil if value.nil?
 
         case type
-        when :string, :hash, :array, :decimal
+        when :string, :decimal
           value
         when :integer, :float, :datetime, :date, :boolean
           TYPES[type].new.type_cast_from_user(value)

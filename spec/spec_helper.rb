@@ -36,10 +36,8 @@ def create_database
     t.boolean :boolean_type
     t.float :float_type
     t.time :time_type
-    t.string :array_type, array: true
     t.date :date_type
     t.datetime :datetime_type
     t.decimal :decimal_type
-    t.hstore :hash_type
   end
 end

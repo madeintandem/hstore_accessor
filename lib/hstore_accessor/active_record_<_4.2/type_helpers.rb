@@ -21,7 +21,7 @@ module HstoreAccessor
         column_class = ActiveRecord::ConnectionAdapters::Column
 
         case type
-        when :string, :hash, :array, :decimal
+        when :string, :decimal
           value
         when :integer
           column_class.value_to_integer(value)

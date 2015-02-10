@@ -8,8 +8,6 @@ FIELDS = {
   weight: { data_type: :float, store_key: "w" },
   popular: :boolean,
   build_timestamp: :datetime,
-  tags: :array,
-  reviews: :hash,
   released_at: :date,
   miles: :decimal
 }
@@ -77,7 +75,7 @@ describe HstoreAccessor do
     let!(:timestamp) { Time.now }
     let!(:datestamp) { Date.today }
     let(:product) { Product.new }
-    let(:persisted_product) { Product.create!(color: "green", price: 10, weight: 10.1, tags: %w(tag1 tag2 tag3), popular: true, build_timestamp: (timestamp - 10.days), released_at: (datestamp - 8.days), miles: BigDecimal.new("9.133790001")) }
+    let(:persisted_product) { Product.create!(color: "green", price: 10, weight: 10.1, popular: true, build_timestamp: (timestamp - 10.days), released_at: (datestamp - 8.days), miles: BigDecimal.new("9.133790001")) }
 
     FIELDS.keys.each do |field|
       it "responds with nil when #{field} is not set" do
@@ -147,9 +145,9 @@ describe HstoreAccessor do
   describe "scopes" do
     let!(:timestamp) { Time.now }
     let!(:datestamp) { Date.today }
-    let!(:product_a) { Product.create(color: "green", price: 10, weight: 10.1, tags: %w(tag1 tag2 tag3), popular: true, build_timestamp: (timestamp - 10.days), released_at: (datestamp - 8.days), miles: BigDecimal.new("10.113379001")) }
-    let!(:product_b) { Product.create(color: "orange", price: 20, weight: 20.2, tags: %w(tag2 tag3 tag4), popular: false, build_timestamp: (timestamp - 5.days), released_at: (datestamp - 4.days), miles: BigDecimal.new("20.213379001")) }
-    let!(:product_c) { Product.create(color: "blue", price: 30, weight: 30.3, tags: %w(tag3 tag4 tag5), popular: true, build_timestamp: timestamp, released_at: datestamp, miles: BigDecimal.new("30.313379001")) }
+    let!(:product_a) { Product.create(color: "green", price: 10, weight: 10.1, popular: true, build_timestamp: (timestamp - 10.days), released_at: (datestamp - 8.days), miles: BigDecimal.new("10.113379001")) }
+    let!(:product_b) { Product.create(color: "orange", price: 20, weight: 20.2, popular: false, build_timestamp: (timestamp - 5.days), released_at: (datestamp - 4.days), miles: BigDecimal.new("20.213379001")) }
+    let!(:product_c) { Product.create(color: "blue", price: 30, weight: 30.3, popular: true, build_timestamp: timestamp, released_at: datestamp, miles: BigDecimal.new("30.313379001")) }
 
     context "for string fields support" do
       it "equality" do
@@ -223,20 +221,7 @@ describe HstoreAccessor do
       end
     end
 
-    context "for array fields support" do
-      it "equality" do
-        expect(Product.tags_eq(%w(tag1 tag2 tag3)).to_a).to eq [product_a]
-      end
-
-      it "contains" do
-        expect(Product.tags_contains("tag2").to_a).to eq [product_a, product_b]
-        expect(Product.tags_contains(%w(tag2 tag3)).to_a).to eq [product_a, product_b]
-        expect(Product.tags_contains(%w(tag1 tag2 tag3)).to_a).to eq [product_a]
-        expect(Product.tags_contains(%w(tag1 tag2 tag3 tag4)).to_a).to eq []
-      end
-    end
-
-    context "for time fields support" do
+    context "for datetime fields support" do
       it "before" do
         expect(Product.build_timestamp_before(timestamp)).to eq [product_a, product_b]
       end
@@ -323,8 +308,6 @@ describe HstoreAccessor do
       it_returns_the_properly_typed_column :datetime, :build_timestamp, ActiveRecord::Type::DateTime
       it_returns_the_properly_typed_column :date, :released_at, ActiveRecord::Type::Date
       it_returns_the_properly_typed_column :decimal, :miles, ActiveRecord::Type::Decimal
-      it_returns_the_properly_typed_column :array, :tags, ActiveRecord::Type::Value
-      it_returns_the_properly_typed_column :hash, :reviews, ActiveRecord::Type::Value
     else
       def self.it_returns_the_properly_typed_column(hstore_type, attribute_name, active_record_type)
         context "#{hstore_type}" do
@@ -386,39 +369,6 @@ describe HstoreAccessor do
       product.save
       product.reload
       expect(product.weight).to eq 93.45
-    end
-
-    context "array values" do
-      it "correctly stores nothing" do
-        product.tags = nil
-        product.save
-        product.reload
-        expect(product.tags).to be_nil
-      end
-
-      it "correctly stores strings" do
-        product.tags = ["household", "living room", "kitchen"]
-        product.save
-        product.reload
-        expect(product.tags).to eq ["household", "living room", "kitchen"]
-      end
-    end
-
-    context "hash values" do
-      it "correctly stores nothing" do
-        product.reviews = nil
-        product.save
-        product.reload
-        expect(product.reviews).to be_nil
-      end
-
-      it "correctly stores hash values as json" do
-        hash = product.reviews = { "user_123" => "4 stars", "user_994" => "3 stars" }
-        product.save
-        product.reload
-        expect(product.reviews).to eq("user_123" => "4 stars", "user_994" => "3 stars")
-        expect(product.options["reviews"]).to eq(hash.to_json)
-      end
     end
 
     context "multipart values" do
