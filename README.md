@@ -258,7 +258,7 @@ This approach was originally concieved by Joe Hirn in [this blog
 post](http://www.devmynd.com/blog/2013-3-single-table-inheritance-hstore-lovely-combination).
 
 ## Upgrading
-Upgrading from version 0.6 to 0.9 should be fairly painless. If you were previously using a `time` type fields, simply change it to `datetime` like so:
+Upgrading from version 0.6.0 to 0.9.0 should be fairly painless. If you were previously using a `time` type fields, simply change it to `datetime` like so:
 
 ```ruby
 # Before...
