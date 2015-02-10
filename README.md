@@ -53,8 +53,8 @@ class Product < ActiveRecord::Base
     price: :float,
     built_at: :datetime,
     build_date: :date,
-    tags: :array,
-    ratings: :hash
+    tags: :array, # deprecated
+    ratings: :hash # deprecated
     miles: :decimal
 end
 ```
@@ -69,8 +69,8 @@ product.price = 99.95
 product.built_at = Time.now - 10.days
 product.build_date = Date.today
 product.popular = true
-product.tags = %w(housewares kitchen)
-product.ratings = { user_a: 3, user_b: 4 }
+product.tags = %w(housewares kitchen) # deprecated
+product.ratings = { user_a: 3, user_b: 4 } # deprecated
 product.miles = 3.14
 ```
 
@@ -78,7 +78,7 @@ Reading these fields works as well.
 
 ```ruby
 product.color # => "green"
-product.tags  # => ["housewares", "kitchen"]
+product.price  # => 99.95
 ```
 
 In order to reduce the storage overhead of hstore keys (especially when
@@ -176,6 +176,8 @@ Product.built_date_after(Date.today - 4.days) # built after the given date
 
 ### Array Fields
 
+*Note: the array field type is deprecated. It is available in version 0.9.0 but not > 1.0.0*
+
 For `array` types, two scopes are created:
 
 ```ruby
@@ -266,6 +268,8 @@ hstore_accessor :data, published_at: :time
 # After...
 hstore_accessor :data, published_at: :datetime
 ```
+
+While the `array` and `hash` types are available in version 0.9.0, they are deprecated and are not available in 1.0.0.
 
 ## Contributing
 ### Basics
