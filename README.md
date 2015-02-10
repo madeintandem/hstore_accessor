@@ -43,7 +43,7 @@ Or install it yourself as:
 The `hstore_accessor` method accepts the name of the hstore column you'd
 like to use and a hash with keys representing fields and values
 indicating the type to be stored in that field.  The available types
-are: `string`, `integer`, `float`, `decimal`, `time`, `date`, `boolean`, `array`, and `hash`. It is available on an class that inherits from `ActiveRecord::Base`.
+are: `string`, `integer`, `float`, `decimal`, `datetime`, `date`, `boolean`, `array`, and `hash`. It is available on an class that inherits from `ActiveRecord::Base`.
 
 ```ruby
 class Product < ActiveRecord::Base
@@ -51,7 +51,7 @@ class Product < ActiveRecord::Base
     color: :string,
     weight: :integer,
     price: :float,
-    built_at: :time,
+    built_at: :datetime,
     build_date: :date,
     tags: :array,
     ratings: :hash
@@ -154,9 +154,9 @@ Product.price_gte(240.00) # price greater than or equal to
 Product.price_gt(240.00)  # price greater than
 ```
 
-### Time Fields
+### Datetime Fields
 
-For `time` fields, three scopes are created:
+For `datetime` fields, three scopes are created:
 
 ```ruby
 Product.built_at_before(Time.now)         # built before the given time
