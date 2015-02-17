@@ -191,8 +191,8 @@ Product.tags_contains(%w(housewares kitchen)) # tags containing a number of valu
 Two scopes are created for `boolean` fields:
 
 ```ruby
-Product.is_popular  # => when populer is set to true
-Product.not_popular # => when populer is set to false
+Product.is_popular  # => when popular is set to true
+Product.not_popular # => when popular is set to false
 ```
 
 Predicate methods are also available on instances:
