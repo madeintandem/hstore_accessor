@@ -23,6 +23,8 @@ Style/AlignParameters:
   Enabled: false
 Style/ClassAndModuleChildren:
   Enabled: false
+Style/ClassVars:
+  Enabled: false
 Style/Documentation:
   Enabled: false
 Style/FileName:
