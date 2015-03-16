@@ -2,6 +2,7 @@ require "spec_helper"
 require "active_support/all"
 
 FIELDS = {
+  name: :string,
   color: :string,
   price: :integer,
   published: { data_type: :boolean, store_key: "p" },
@@ -9,6 +10,7 @@ FIELDS = {
   popular: :boolean,
   build_timestamp: :datetime,
   released_at: :date,
+  likes: :integer,
   miles: :decimal
 }
 
@@ -16,9 +18,15 @@ DATA_FIELDS = {
   color_data: :string
 }
 
+class ProductCategory < ActiveRecord::Base
+  hstore_accessor :options, name: :string, likes: :integer
+  has_many :products
+end
+
 class Product < ActiveRecord::Base
   hstore_accessor :options, FIELDS
   hstore_accessor :data, DATA_FIELDS
+  belongs_to :product_category
 end
 
 class SuperProduct < Product
@@ -145,9 +153,34 @@ describe HstoreAccessor do
   describe "scopes" do
     let!(:timestamp) { Time.now }
     let!(:datestamp) { Date.today }
-    let!(:product_a) { Product.create(color: "green", price: 10, weight: 10.1, popular: true, build_timestamp: (timestamp - 10.days), released_at: (datestamp - 8.days), miles: BigDecimal.new("10.113379001")) }
+    let!(:product_a) { Product.create(likes: 3, name: "widget", color: "green", price: 10, weight: 10.1, popular: true, build_timestamp: (timestamp - 10.days), released_at: (datestamp - 8.days), miles: BigDecimal.new("10.113379001")) }
     let!(:product_b) { Product.create(color: "orange", price: 20, weight: 20.2, popular: false, build_timestamp: (timestamp - 5.days), released_at: (datestamp - 4.days), miles: BigDecimal.new("20.213379001")) }
     let!(:product_c) { Product.create(color: "blue", price: 30, weight: 30.3, popular: true, build_timestamp: timestamp, released_at: datestamp, miles: BigDecimal.new("30.313379001")) }
+
+    context "ambiguous column names" do
+      let!(:product_category) { ProductCategory.create!(name: "widget", likes: 2) }
+
+      before do
+        product_category.products = Product.all
+        product_category.save!
+      end
+
+      context "eq query" do
+        let!(:query) { Product.all.joins(:product_category).merge(ProductCategory.with_name("widget")).with_name("widget") }
+
+        it "qualifies the table name to prevent ambiguous column name references" do
+          expect { query.to_a }.to_not raise_error
+        end
+      end
+
+      context "query" do
+        let!(:query) { Product.all.joins(:product_category).merge(ProductCategory.likes_lt(4)).likes_lt(4) }
+
+        it "qualifies the table name to prevent ambiguous column name references" do
+          expect { query.to_a }.to_not raise_error
+        end
+      end
+    end
 
     context "for string fields support" do
       it "equality" do
