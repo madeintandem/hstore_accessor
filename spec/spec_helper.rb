@@ -26,6 +26,7 @@ def create_database
 
   ActiveRecord::Base.connection.execute("CREATE EXTENSION hstore;") rescue ActiveRecord::StatementInvalid
   ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS products;")
+  ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS product_categories;")
 
   ActiveRecord::Base.connection.create_table(:products) do |t|
     t.hstore :options
@@ -33,6 +34,7 @@ def create_database
 
     t.string :string_type
     t.integer :integer_type
+    t.integer :product_category_id
     t.boolean :boolean_type
     t.float :float_type
     t.time :time_type
@@ -41,5 +43,9 @@ def create_database
     t.datetime :datetime_type
     t.decimal :decimal_type
     t.hstore :hash_type
+  end
+
+  ActiveRecord::Base.connection.create_table(:product_categories) do |t|
+    t.hstore :options
   end
 end

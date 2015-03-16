@@ -115,8 +115,8 @@ module HstoreAccessor
             end
           end
 
-          query_field = "#{hstore_attribute} -> '#{store_key}'"
-          eq_query_field = "#{hstore_attribute} @> hstore('#{store_key}', ?)"
+          query_field = "#{table_name}.#{hstore_attribute} -> '#{store_key}'"
+          eq_query_field = "#{table_name}.#{hstore_attribute} @> hstore('#{store_key}', ?)"
 
           case data_type
           when :string
