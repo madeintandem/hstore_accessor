@@ -92,7 +92,7 @@ module HstoreAccessor
               hstore_changes = send("#{hstore_attribute}_change")
               return if hstore_changes.nil?
               attribute_changes = hstore_changes.map { |change| change.try(:[], store_key.to_s) }
-              attribute_changes.compact.present? ? attribute_changes : nil
+              attribute_changes.uniq.size == 1 ? nil : attribute_changes
             end
 
             define_method("restore_#{key}!") do
