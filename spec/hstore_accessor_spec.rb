@@ -163,8 +163,9 @@ describe HstoreAccessor do
       let!(:product_category) { ProductCategory.create!(name: "widget", likes: 2) }
 
       before do
-        product_category.products = Product.all
-        product_category.save!
+        Product.all.to_a.each do |product|
+          product_category.products << product
+        end
       end
 
       context "eq query" do
@@ -492,7 +493,7 @@ describe HstoreAccessor do
         product.save!
         product.reload
         Time.use_zone(new_york_timezone) do
-          expect(product.build_timestamp.utc_offset).to eq new_york_timezone.utc_offset
+          expect(product.build_timestamp.to_s).to eq timestamp.in_time_zone(new_york_timezone).to_s
         end
       end
     end
@@ -675,12 +676,14 @@ describe HstoreAccessor do
         product.color = "GREEN"
         expect(product.color_change).to eq %w(ORANGE GREEN)
       end
+
       context "when store_key differs from key" do
         it "returns the old and new values" do
           product.weight = 100.01
           expect(product.weight_change[1]).to eq "100.01"
         end
       end
+
       context "hstore attribute was nil" do
         it "returns old and new values" do
           product.options = nil
@@ -696,6 +699,18 @@ describe HstoreAccessor do
           product.save!
           product.price = 6
           expect(product.color_change).to be_nil
+        end
+
+        it "returns nil when other attributes were changed" do
+          product.price = 5
+          product.save!
+          product = Product.first
+
+          expect(product.price_change).to be_nil
+
+          product.color = "red"
+
+          expect(product.price_change).to be_nil
         end
       end
 
