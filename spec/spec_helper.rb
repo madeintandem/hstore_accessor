@@ -4,6 +4,13 @@ require "shoulda-matchers"
 
 DatabaseCleaner.strategy = :truncation
 
+Shoulda::Matchers.configure do |config|
+  config.integrate do |with|
+    with.test_framework :rspec
+    with.library :active_record
+  end
+end
+
 RSpec.configure do |config|
   config.mock_with :rspec
   config.order = :random
