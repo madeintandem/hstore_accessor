@@ -29,7 +29,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec", "~> 3.1.0"
   spec.add_development_dependency "rubocop"
-  spec.add_development_dependency "shoulda-matchers"
 
   spec.post_install_message = "Please note that the `array` and `hash` types are no longer supported in version 1.0.0"
 end

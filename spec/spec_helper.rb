@@ -1,6 +1,5 @@
 require "hstore_accessor"
 require "database_cleaner"
-require "shoulda-matchers"
 
 DatabaseCleaner.strategy = :truncation
 

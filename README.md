@@ -43,7 +43,7 @@ Or install it yourself as:
 The `hstore_accessor` method accepts the name of the hstore column you'd
 like to use and a hash with keys representing fields and values
 indicating the type to be stored in that field.  The available types
-are: `string`, `integer`, `float`, `decimal`, `datetime`, `date`, `boolean`, `array`, and `hash`. It is available on an class that inherits from `ActiveRecord::Base`.
+are: `string`, `integer`, `float`, `decimal`, `datetime`, `date`, `boolean`, `array`, and `hash`. It is available on any class that inherits from `ActiveRecord::Base`.
 
 ```ruby
 class Product < ActiveRecord::Base
@@ -126,7 +126,7 @@ end
 
 Overriding methods is supported, with access to the original Hstore Accessor implementation available via `super`.
 
-Additionally, there is also `hstore_metadata_for_<fields>` on both the class and instances. `column_for_attribute` will also return a column object for an Hstore Accessor defined field. If you're using ActiveRecord 4.2, `type_for_attribute` will return a type object for Hstore Accessor defined fields the same as it does for actual columns. 
+Additionally, there is also `hstore_metadata_for_<fields>` on both the class and instances. `column_for_attribute` will also return a column object for an Hstore Accessor defined field. If you're using ActiveRecord 4.2, `type_for_attribute` will return a type object for Hstore Accessor defined fields the same as it does for actual columns.
 
 ## Scopes
 
@@ -214,7 +214,7 @@ rows can have different values.
 We set up our table with an hstore field:
 
 ```ruby
-# db/migration/<timestamp>_create_players_table.rb
+# db/migration/<timestamp>_create_vehicles_table.rb
 class CreateVehiclesTable < ActiveRecord::Migration
   def change
     create_table :vehicles do |t|
@@ -273,7 +273,7 @@ While the `array` and `hash` types are available in version 0.9.0, they are depr
 
 ## Contributing
 ### Basics
-1. [Fork it](https://github.com/devmynd/hstore_accessor/fork) 
+1. [Fork it](https://github.com/devmynd/hstore_accessor/fork)
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Write code _and_ tests
 4. Commit your changes (`git commit -am 'Add some feature'`)

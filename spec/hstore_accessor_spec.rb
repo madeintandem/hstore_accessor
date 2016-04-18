@@ -71,12 +71,6 @@ describe HstoreAccessor do
       expect(product.hstore_metadata_for_options).to eq FIELDS
       expect(product.hstore_metadata_for_data).to eq DATA_FIELDS
     end
-
-    context "instance method" do
-      subject { Product.new }
-      it { is_expected.to delegate_method(:hstore_metadata_for_options).to(:class) }
-      it { is_expected.to delegate_method(:hstore_metadata_for_data).to(:class) }
-    end
   end
 
   context "nil values" do
