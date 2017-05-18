@@ -323,7 +323,26 @@ describe HstoreAccessor do
   end
 
   describe "#column_for_attribute" do
-    if ActiveRecord::VERSION::STRING.to_f >= 4.2
+    if ActiveRecord::VERSION::STRING.to_f >= 5.0
+      def self.it_returns_the_properly_typed_column(type, attribute_name, cast_type_class)
+        context "#{type}" do
+          subject { SuperProduct.column_for_attribute(attribute_name) }
+          it "returns a column with a #{type} cast type" do
+            expect(subject).to be_a(ActiveRecord::ConnectionAdapters::Column)
+            expect(subject.sql_type_metadata).to eq(cast_type_class.new)
+          end
+        end
+      end
+
+      it_returns_the_properly_typed_column :string, :color, ActiveRecord::Type::String
+      it_returns_the_properly_typed_column :integer, :price, ActiveRecord::Type::Integer
+      it_returns_the_properly_typed_column :boolean, :published, ActiveRecord::Type::Boolean
+      it_returns_the_properly_typed_column :float, :weight, ActiveRecord::Type::Float
+      it_returns_the_properly_typed_column :datetime, :build_timestamp, ActiveRecord::Type::DateTime
+      it_returns_the_properly_typed_column :date, :released_at, ActiveRecord::Type::Date
+      it_returns_the_properly_typed_column :decimal, :miles, ActiveRecord::Type::Decimal
+
+    elsif ActiveRecord::VERSION::STRING.to_f >= 4.2
 
       def self.it_returns_the_properly_typed_column(type, attribute_name, cast_type_class)
         context "#{type}" do
@@ -516,7 +535,7 @@ describe HstoreAccessor do
       end
 
       it "type casts boolean values" do
-        ActiveRecord::ConnectionAdapters::Column::TRUE_VALUES.each do |value|
+        [true, 1, "t"].each do |value|
           product.popular = value
           expect(product.popular).to be true
 
@@ -524,7 +543,7 @@ describe HstoreAccessor do
           expect(product.published).to be true
         end
 
-        ActiveRecord::ConnectionAdapters::Column::FALSE_VALUES.each do |value|
+        [false, 0, "f"].each do |value|
           product.popular = value
           expect(product.popular).to be false
 
