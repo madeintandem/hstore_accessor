@@ -3,7 +3,7 @@
 ## Starting a new project? Use [Jsonb Accessor](https://github.com/devmynd/jsonb_accessor) instead! It has more features and is better maintained.
 
 ## Description
-Hstore Accessor allows you to treat fields on an hstore column as though they were actual columns being picked up by ActiveRecord. This is especially handy when trying to avoid sparse columns while making use of [single table inheritence](#single-table-inheritance). Hstore Accessor currently supports ActiveRecord versions 4.0, 4.1, 4.2, 5.0, and 5.1.
+Hstore Accessor allows you to treat fields on an hstore column as though they were actual columns being picked up by ActiveRecord. This is especially handy when trying to avoid sparse columns while making use of [single table inheritence](#single-table-inheritance). Hstore Accessor currently supports ActiveRecord versions 4.2, 5.0, 5.1, 5.2 and 6.0.
 
 
 ## Table of Contents
