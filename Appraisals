@@ -1,3 +1,8 @@
+appraise "activerecord-6.0" do
+  gem "activerecord", "~> 6.0.0"
+  gem "pg", ">= 0.21.0", "< 2"
+end
+
 appraise "activerecord-5.2" do
   gem "activerecord", "~> 5.2.0"
   gem "pg", ">= 0.21.0"
