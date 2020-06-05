@@ -426,7 +426,7 @@ describe HstoreAccessor do
 
     context "multipart values" do
       it "stores multipart dates correctly" do
-        product.update_attributes!(
+        product.update!(
           "released_at(1i)" => "2014",
           "released_at(2i)" => "04",
           "released_at(3i)" => "14"
