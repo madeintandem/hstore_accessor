@@ -25,7 +25,7 @@ module HstoreAccessor
     DESERIALIZERS = {
       boolean: -> value { TypeHelpers.cast(:boolean, value) },
       date: -> value { value && Date.parse(value) },
-      decimal: -> value { value && (value == '' ? BigDecimal.new(0) : BigDecimal.new(value)) },
+      decimal: -> value { value && (value == '' ? BigDecimal(0) : BigDecimal(value)) },
       float: -> value { value && value.to_f },
       integer: -> value { value && value.to_i },
       datetime: -> value { value && Time.at(value.to_i).in_time_zone }
