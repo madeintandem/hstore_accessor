@@ -1,6 +1,7 @@
-# HstoreAccessor
+# HstoreAccessor (Deprecated)
 
-## Starting a new project? Use [Jsonb Accessor](https://github.com/devmynd/jsonb_accessor) instead! It has more features and is better maintained.
+## Please note that this repo is deprecated and is no longer being maintained.
+**Use [Jsonb Accessor](https://github.com/devmynd/jsonb_accessor) instead! It has more features and is better maintained.**
 
 ## Description
 Hstore Accessor allows you to treat fields on an hstore column as though they were actual columns being picked up by ActiveRecord. This is especially handy when trying to avoid sparse columns while making use of [single table inheritence](#single-table-inheritance). Hstore Accessor currently supports ActiveRecord versions 4.0, 4.1, 4.2, 5.0, and 5.1.
@@ -8,21 +9,25 @@ Hstore Accessor allows you to treat fields on an hstore column as though they we
 
 ## Table of Contents
 
-* [Installation](#installation)
-* [Setup](#setup)
-* [ActiveRecord methods generated for fields](#activerecord-methods-generated-for-fields)
-* [Scopes](#scopes)
-  * [String Fields](#string-fields)
-  * [Integer, Float, and Decimal Fields](#integer-float-decimal-fields)
-  * [Datetime Fields](#datetime-fields)
-  * [Date Fields](#date-fields)
-  * [Array Fields](#array-fields)
-  * [Boolean Fields](#boolean-fields)
-* [Single Table Inheritence](#single-table-inheritance)
-* [Upgrading](#upgrading)
-* [Contributing](#contributing)
-  - [Basics](#basics)
-  - [Developing Locally](#developing-locally)
+- [HstoreAccessor (Deprecated)](#hstoreaccessor-deprecated)
+  - [Please note that this repo is deprecated and is no longer being maintained.](#please-note-that-this-repo-is-deprecated-and-is-no-longer-being-maintained)
+  - [Description](#description)
+  - [Table of Contents](#table-of-contents)
+  - [Installation](#installation)
+  - [Setup](#setup)
+  - [ActiveRecord methods generated for fields](#activerecord-methods-generated-for-fields)
+  - [Scopes](#scopes)
+    - [String Fields](#string-fields)
+    - [Integer, Float, Decimal Fields](#integer-float-decimal-fields)
+    - [Datetime Fields](#datetime-fields)
+    - [Date Fields](#date-fields)
+    - [Array Fields](#array-fields)
+    - [Boolean Fields](#boolean-fields)
+    - [Single-table Inheritance](#single-table-inheritance)
+  - [Upgrading](#upgrading)
+  - [Contributing](#contributing)
+    - [Basics](#basics)
+    - [Developing Locally](#developing-locally)
 
 ## Installation
 
