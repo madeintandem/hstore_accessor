@@ -84,6 +84,17 @@ module HstoreAccessor
               send("#{key}_change").present?
             end
 
+            define_method("saved_change_to_#{key}") do
+              hstore_changes = previous_changes[hstore_attribute]
+              return if hstore_changes.nil?
+              attribute_changes = hstore_changes.map { |change| change.try(:[], store_key.to_s) }
+              attribute_changes.uniq.size == 1 ? nil : attribute_changes
+            end
+
+            define_method("saved_change_to_#{key}?") do
+              send("saved_change_to_#{key}").present?
+            end
+
             define_method("#{key}_was") do
               (send(:attribute_was, hstore_attribute.to_s) || {})[key.to_s]
             end

@@ -595,6 +595,14 @@ describe HstoreAccessor do
   describe "dirty tracking" do
     let(:product) { Product.new }
 
+    it "save_changed_to_<attr>? should return the expected value" do
+      expect(product.saved_change_to_color?).to be false
+      product.color = "ORANGE"
+      product.save
+      expect(product.saved_change_to_price?).to be false
+      expect(product.saved_change_to_color?).to be true
+    end
+
     it "<attr>_changed? should return the expected value" do
       expect(product.color_changed?).to be false
       product.color = "ORANGE"
