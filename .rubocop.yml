@@ -1,7 +1,7 @@
 AllCops:
   Include:
     - Rakefile
-Lint/SpaceBeforeFirstArg:
+Layout/SpaceBeforeFirstArg:
   Enabled: false
 Lint/UnusedBlockArgument:
   Enabled: false
@@ -13,13 +13,13 @@ Metrics/ClassLength:
   Enabled: false
 Metrics/CyclomaticComplexity:
   Enabled: false
-Metrics/LineLength:
+Layout/LineLength:
   Enabled: false
 Metrics/MethodLength:
   Enabled: false
 Metrics/PerceivedComplexity:
   Enabled: false
-Style/AlignParameters:
+Layout/ParameterAlignment:
   Enabled: false
 Style/ClassAndModuleChildren:
   Enabled: false
@@ -27,17 +27,17 @@ Style/ClassVars:
   Enabled: false
 Style/Documentation:
   Enabled: false
-Style/FileName:
+Naming/FileName:
   Enabled: false
 Style/GuardClause:
   Enabled: false
-Style/IndentHash:
+Layout/FirstHashElementIndentation:
   Enabled: false
 Style/RescueModifier:
   Enabled: false
 Style/SignalException:
   Enabled: false
-Style/SpaceAroundEqualsInParameterDefault:
+Layout/SpaceAroundEqualsInParameterDefault:
   Enabled: false
 Style/StringLiterals:
   EnforcedStyle: double_quotes

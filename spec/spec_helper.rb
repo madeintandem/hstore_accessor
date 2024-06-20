@@ -25,11 +25,20 @@ RSpec.configure do |config|
 end
 
 def create_database
-  ActiveRecord::Base.establish_connection(
-    adapter: "postgresql",
-    database: "hstore_accessor",
-    username: "postgres"
-  )
+  begin
+    ActiveRecord::Base.establish_connection(
+      adapter: "postgresql",
+      database: "hstore_accessor",
+      username: "postgres"
+    )
+    ActiveRecord::Base.connection
+  rescue ActiveRecord::NoDatabaseError => e
+    ActiveRecord::Base.establish_connection(
+      adapter: "postgresql",
+      username: "postgres"
+    )
+    ActiveRecord::Base.connection.create_database("hstore_accessor")
+  end
 
   ActiveRecord::Base.connection.execute("CREATE EXTENSION hstore;") rescue ActiveRecord::StatementInvalid
   ActiveRecord::Base.connection.execute("DROP TABLE IF EXISTS products;")
