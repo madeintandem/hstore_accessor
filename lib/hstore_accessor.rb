@@ -2,7 +2,9 @@ require "active_support"
 require "active_record"
 require "hstore_accessor/version"
 
-if ::ActiveRecord::VERSION::STRING.to_f >= 5.0
+if ::ActiveRecord::VERSION::STRING.to_f >= 7.0
+  require "hstore_accessor/active_record_7.1/type_helpers"
+elsif ::ActiveRecord::VERSION::STRING.to_f >= 5.0 && ::ActiveRecord::VERSION::STRING.to_f < 7.1
   require "hstore_accessor/active_record_5.0/type_helpers"
 elsif ::ActiveRecord::VERSION::STRING.to_f >= 4.2 && ::ActiveRecord::VERSION::STRING.to_f < 5.0
   require "hstore_accessor/active_record_4.2/type_helpers"
