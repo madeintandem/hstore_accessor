@@ -1,0 +1,14 @@
+#!/bin/sh
+set -eu
+
+# Keep generated lockfiles out of the checkout mounted at /source.
+cp -R /source/. /work/
+cd /work
+gem install --local /checks/bundler.gem --no-document
+
+# Explicit activation avoids the Ruby 2.3 image's bundled Bundler 1.x.
+ruby -e 'gem "bundler", "2.3.26"; load Gem.bin_path("bundler", "bundle", "2.3.26")' -- install --jobs 4 --retry 3
+# Legacy adapters cache PostgreSQL types on connection, before spec setup runs.
+ruby -e 'gem "bundler", "2.3.26"; require "bundler/setup"; require "pg"; PG.connect(dbname: "hstore_accessor", user: "postgres").exec("CREATE EXTENSION IF NOT EXISTS hstore")'
+ruby -e 'gem "bundler", "2.3.26"; require "bundler/setup"; require "active_record"; require "pg"; puts "Ruby #{RUBY_VERSION}; ActiveRecord #{ActiveRecord::VERSION::STRING}; pg #{Gem.loaded_specs.fetch("pg").version}"'
+ruby -e 'gem "bundler", "2.3.26"; require "bundler/setup"; require "rspec/core"; RSpec.configure { |config| config.fail_if_no_examples = true }; exit RSpec::Core::Runner.run(ARGV)' -- spec
