@@ -102,8 +102,8 @@ module HstoreAccessor
 
             define_method("reset_#{key}!") do
               if ActiveRecord::VERSION::STRING.to_f >= 4.2
-                ActiveSupport::Deprecation.warn(<<-MSG.squish)
-                  `#reset_#{key}!` is deprecated and will be removed on Rails 5.
+                HstoreAccessor.deprecator.warn(<<-MSG.squish)
+                  `#reset_#{key}!` is deprecated.
                   Please use `#restore_#{key}!` instead.
                 MSG
               end

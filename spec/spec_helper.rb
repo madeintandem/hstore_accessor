@@ -2,8 +2,6 @@ require "hstore_accessor"
 require "database_cleaner"
 require "shoulda-matchers"
 
-DatabaseCleaner.strategy = :truncation
-
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
     with.test_framework :rspec
@@ -17,10 +15,11 @@ RSpec.configure do |config|
 
   config.before :suite do
     create_database
+    DatabaseCleaner[:active_record].strategy = :truncation
   end
 
   config.before do
-    DatabaseCleaner.clean
+    DatabaseCleaner[:active_record].clean
   end
 end
 

@@ -33,6 +33,13 @@ class SuperProduct < Product
 end
 
 describe HstoreAccessor do
+  describe ".deprecator" do
+    it "uses a reusable deprecator instance" do
+      expect(HstoreAccessor.deprecator).to be_a(ActiveSupport::Deprecation)
+      expect(HstoreAccessor.deprecator).to equal(HstoreAccessor.deprecator)
+    end
+  end
+
   context "macro" do
     let(:product) { Product.new }
 
@@ -83,7 +90,7 @@ describe HstoreAccessor do
     let!(:timestamp) { Time.now }
     let!(:datestamp) { Date.today }
     let(:product) { Product.new }
-    let(:persisted_product) { Product.create!(color: "green", price: 10, weight: 10.1, popular: true, build_timestamp: (timestamp - 10.days), released_at: (datestamp - 8.days), miles: BigDecimal.new("9.133790001")) }
+    let(:persisted_product) { Product.create!(color: "green", price: 10, weight: 10.1, popular: true, build_timestamp: (timestamp - 10.days), released_at: (datestamp - 8.days), miles: BigDecimal("9.133790001")) }
 
     FIELDS.keys.each do |field|
       it "responds with nil when #{field} is not set" do
@@ -153,9 +160,9 @@ describe HstoreAccessor do
   describe "scopes" do
     let!(:timestamp) { Time.now }
     let!(:datestamp) { Date.today }
-    let!(:product_a) { Product.create(likes: 3, name: "widget", color: "green", price: 10, weight: 10.1, popular: true, build_timestamp: (timestamp - 10.days), released_at: (datestamp - 8.days), miles: BigDecimal.new("10.113379001")) }
-    let!(:product_b) { Product.create(color: "orange", price: 20, weight: 20.2, popular: false, build_timestamp: (timestamp - 5.days), released_at: (datestamp - 4.days), miles: BigDecimal.new("20.213379001")) }
-    let!(:product_c) { Product.create(color: "blue", price: 30, weight: 30.3, popular: true, build_timestamp: timestamp, released_at: datestamp, miles: BigDecimal.new("30.313379001")) }
+    let!(:product_a) { Product.create(likes: 3, name: "widget", color: "green", price: 10, weight: 10.1, popular: true, build_timestamp: (timestamp - 10.days), released_at: (datestamp - 8.days), miles: BigDecimal("10.113379001")) }
+    let!(:product_b) { Product.create(color: "orange", price: 20, weight: 20.2, popular: false, build_timestamp: (timestamp - 5.days), released_at: (datestamp - 4.days), miles: BigDecimal("20.213379001")) }
+    let!(:product_c) { Product.create(color: "blue", price: 30, weight: 30.3, popular: true, build_timestamp: timestamp, released_at: datestamp, miles: BigDecimal("30.313379001")) }
 
     context "ambiguous column names" do
       let!(:product_category) { ProductCategory.create!(name: "widget", likes: 2) }
@@ -235,23 +242,23 @@ describe HstoreAccessor do
 
     context "for decimal fields support" do
       it "less than" do
-        expect(Product.miles_lt(BigDecimal.new("10.55555")).to_a).to eq [product_a]
+        expect(Product.miles_lt(BigDecimal("10.55555")).to_a).to eq [product_a]
       end
 
       it "less than or equal" do
-        expect(Product.miles_lte(BigDecimal.new("20.213379001")).to_a).to eq [product_a, product_b]
+        expect(Product.miles_lte(BigDecimal("20.213379001")).to_a).to eq [product_a, product_b]
       end
 
       it "equality" do
-        expect(Product.miles_eq(BigDecimal.new("10.113379001")).to_a).to eq [product_a]
+        expect(Product.miles_eq(BigDecimal("10.113379001")).to_a).to eq [product_a]
       end
 
       it "greater than or equal" do
-        expect(Product.miles_gte(BigDecimal.new("20.213379001")).to_a).to eq [product_b, product_c]
+        expect(Product.miles_gte(BigDecimal("20.213379001")).to_a).to eq [product_b, product_c]
       end
 
       it "greater than" do
-        expect(Product.miles_gt(BigDecimal.new("20.555555")).to_a).to eq [product_c]
+        expect(Product.miles_gt(BigDecimal("20.555555")).to_a).to eq [product_c]
       end
     end
 
@@ -323,13 +330,27 @@ describe HstoreAccessor do
   end
 
   describe "#column_for_attribute" do
+    if ActiveRecord::VERSION::STRING.to_f >= 4.2
+      it "preserves native column metadata" do
+        column = SuperProduct.column_for_attribute("string_type")
+        expect(column.type).to eq(:string)
+        expect(column.name).to eq("string_type")
+      end
+    end
+
     if ActiveRecord::VERSION::STRING.to_f >= 5.0
       def self.it_returns_the_properly_typed_column(type, attribute_name, cast_type_class)
         context "#{type}" do
           subject { SuperProduct.column_for_attribute(attribute_name) }
           it "returns a column with a #{type} cast type" do
             expect(subject).to be_a(ActiveRecord::ConnectionAdapters::Column)
-            expect(subject.sql_type_metadata).to eq(cast_type_class.new)
+            if Gem::Version.new(ActiveRecord::VERSION::STRING) >= Gem::Version.new("7.2")
+              expect(subject.sql_type_metadata).to be_a(ActiveRecord::ConnectionAdapters::SqlTypeMetadata)
+              expect(subject.type).to eq(cast_type_class.new.type)
+              expect(subject.sql_type).to eq(ActiveRecord::Base.connection.type_to_sql(type))
+            else
+              expect(subject.sql_type_metadata).to eq(cast_type_class.new)
+            end
           end
         end
       end
@@ -426,7 +447,7 @@ describe HstoreAccessor do
 
     context "multipart values" do
       it "stores multipart dates correctly" do
-        product.update_attributes!(
+        product.update!(
           "released_at(1i)" => "2014",
           "released_at(2i)" => "04",
           "released_at(3i)" => "14"
@@ -477,7 +498,7 @@ describe HstoreAccessor do
     end
 
     it "correctly stores decimal values" do
-      decimal = BigDecimal.new("9.13370009001")
+      decimal = BigDecimal("9.13370009001")
       product.miles = decimal
       product.save
       product.reload
@@ -531,7 +552,7 @@ describe HstoreAccessor do
 
       it "type casts decimal values" do
         product.miles = "1.337900129339202"
-        expect(product.miles).to eq BigDecimal.new("1.337900129339202")
+        expect(product.miles).to eq BigDecimal("1.337900129339202")
       end
 
       it "type casts boolean values" do
@@ -692,17 +713,17 @@ describe HstoreAccessor do
 
     describe "#reset_<attr>!" do
       before do
-        allow(ActiveSupport::Deprecation).to receive(:warn)
+        allow(HstoreAccessor.deprecator).to receive(:warn)
       end
 
       if ActiveRecord::VERSION::STRING.to_f >= 4.2
         it "displays a deprecation warning" do
-          expect(ActiveSupport::Deprecation).to receive(:warn)
+          expect(HstoreAccessor.deprecator).to receive(:warn).with(/Please use `#restore_color!` instead/)
           product.reset_color!
         end
       else
         it "does not display a deprecation warning" do
-          expect(ActiveSupport::Deprecation).to_not receive(:warn)
+          expect(HstoreAccessor.deprecator).to_not receive(:warn)
           product.reset_color!
         end
       end

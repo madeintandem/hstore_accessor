@@ -1,25 +1,31 @@
 AllCops:
+  NewCops: disable
+  TargetRubyVersion: 3.3
   Include:
     - Rakefile
-Lint/SpaceBeforeFirstArg:
+Layout/SpaceBeforeFirstArg:
   Enabled: false
 Lint/UnusedBlockArgument:
   Enabled: false
 Lint/UnusedMethodArgument:
   Enabled: false
+Lint/ConstantDefinitionInBlock:
+  # These specs intentionally define and reopen models to exercise the macro.
+  Exclude:
+    - spec/hstore_accessor_spec.rb
 Metrics/AbcSize:
   Enabled: false
 Metrics/ClassLength:
   Enabled: false
 Metrics/CyclomaticComplexity:
   Enabled: false
-Metrics/LineLength:
+Layout/LineLength:
   Enabled: false
 Metrics/MethodLength:
   Enabled: false
 Metrics/PerceivedComplexity:
   Enabled: false
-Style/AlignParameters:
+Layout/ParameterAlignment:
   Enabled: false
 Style/ClassAndModuleChildren:
   Enabled: false
@@ -27,17 +33,17 @@ Style/ClassVars:
   Enabled: false
 Style/Documentation:
   Enabled: false
-Style/FileName:
+Naming/FileName:
   Enabled: false
 Style/GuardClause:
   Enabled: false
-Style/IndentHash:
+Layout/HashAlignment:
   Enabled: false
 Style/RescueModifier:
   Enabled: false
 Style/SignalException:
   Enabled: false
-Style/SpaceAroundEqualsInParameterDefault:
+Layout/SpaceAroundEqualsInParameterDefault:
   Enabled: false
 Style/StringLiterals:
   EnforcedStyle: double_quotes
