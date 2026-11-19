@@ -85,4 +85,4 @@ jobs:
       - name: Check style and lint Ruby files
         run: |
           bundle exec rake rubocop
-          bundle exec rubocop --lint '**/*.rb' Appraisals 'gemfiles/*.gemfile' hstore_accessor.gemspec Rakefile
+          bundle exec rubocop --lint 'lib/**/*.rb' 'spec/**/*.rb' Appraisals 'gemfiles/*.gemfile' hstore_accessor.gemspec Rakefile
