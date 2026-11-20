@@ -21,13 +21,13 @@ Gem::Specification.new do |spec|
   spec.add_dependency "activerecord", ">= 4.0.0"
 
   spec.add_development_dependency "appraisal"
-  spec.add_development_dependency "bundler", "~> 1.7"
+  spec.add_development_dependency "bundler", ">= 1.7"
   spec.add_development_dependency "database_cleaner"
   spec.add_development_dependency "pry"
   spec.add_development_dependency "pry-doc"
   spec.add_development_dependency "pry-nav"
-  spec.add_development_dependency "rake", "< 11.0"
-  spec.add_development_dependency "rspec", "~> 3.1.0"
+  spec.add_development_dependency "rake", "~> 13.0"
+  spec.add_development_dependency "rspec", "~> 3.13"
   spec.add_development_dependency "rubocop"
   spec.add_development_dependency "shoulda-matchers", "~> 3.1"
 

@@ -4,7 +4,7 @@
 **Use [Jsonb Accessor](https://github.com/devmynd/jsonb_accessor) instead! It has more features and is better maintained.**
 
 ## Description
-Hstore Accessor allows you to treat fields on an hstore column as though they were actual columns being picked up by ActiveRecord. This is especially handy when trying to avoid sparse columns while making use of [single table inheritence](#single-table-inheritance). Hstore Accessor currently supports ActiveRecord versions 4.0, 4.1, 4.2, 5.0, and 5.1.
+Hstore Accessor allows you to treat fields on an hstore column as though they were actual columns being picked up by ActiveRecord. This is especially handy when trying to avoid sparse columns while making use of [single table inheritence](#single-table-inheritance). Hstore Accessor currently supports ActiveRecord versions 4.0, 4.1, 4.2, 5.0, 5.1, and 7.2.
 
 
 ## Table of Contents
@@ -289,9 +289,15 @@ While the `array` and `hash` types are available in version 0.9.0, they are depr
 
 ### Developing Locally
 Before you make your pull requests, please make sure you style is in line with our Rubocop settings and that all of the tests pass.
+Use Ruby 3.3.14 (see `.ruby-version`).
+The commands below use ActiveRecord 7.2, matching Chronogolf.
+CI also runs the ActiveRecord 4.0–5.1 tests with Ruby 2.3.3; lint runs separately with Ruby 3.3.
 
 1. `bundle install`
-2. `appraisal install`
+2. `BUNDLE_GEMFILE=gemfiles/activerecord_7.2.gemfile bundle install`
 3. Make sure Postgres is installed and running
-4. `appraisal rspec` to run all the tests
-5. `rubocop` to check for style
+4. `bundle exec appraisal activerecord-7.2 rspec` to run the tests with ActiveRecord 7.2
+5. `bundle exec rubocop` to check for style
+
+Tests use the `hstore_accessor` database as `postgres` and recreate tables;
+keep it separate from application data.

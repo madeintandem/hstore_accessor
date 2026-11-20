@@ -1,0 +1,88 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Ruby ${{ matrix.ruby }} / ActiveRecord ${{ matrix.activerecord }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - ruby: "2.3.3"
+            activerecord: "4.0"
+            postgres: "9.6"
+          - ruby: "2.3.3"
+            activerecord: "4.1"
+            postgres: "9.6"
+          - ruby: "2.3.3"
+            activerecord: "4.2"
+            postgres: "9.6"
+          - ruby: "2.3.3"
+            activerecord: "5.0"
+            postgres: "9.6"
+          - ruby: "2.3.3"
+            activerecord: "5.1"
+            postgres: "9.6"
+          - ruby: "3.3.14"
+            activerecord: "7.2"
+            postgres: "16"
+    services:
+      postgres:
+        image: postgres:${{ matrix.postgres }}
+        env:
+          POSTGRES_DB: hstore_accessor
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d hstore_accessor"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      # Run Actions on the host: their Node runtime cannot run in the Ruby 2.3 image.
+      - name: Download Bundler and current CA certificates
+        run: |
+          curl --fail --location --retry 3 https://rubygems.org/downloads/bundler-2.3.26.gem --output "$RUNNER_TEMP/bundler.gem"
+          cp /etc/ssl/certs/ca-certificates.crt "$RUNNER_TEMP/ca-certificates.crt"
+      - name: Run specs
+        env:
+          RUBY_VERSION: ${{ matrix.ruby }}
+          BUNDLE_GEMFILE: gemfiles/activerecord_${{ matrix.activerecord }}.gemfile
+        run: |
+          docker run --rm --network host \
+            --env PGHOST=127.0.0.1 \
+            --env BUNDLE_GEMFILE \
+            --env SSL_CERT_FILE=/checks/ca-certificates.crt \
+            --env BUNDLE_SSL_CA_CERT=/checks/ca-certificates.crt \
+            --mount "type=bind,source=$GITHUB_WORKSPACE,target=/source,readonly" \
+            --mount "type=bind,source=$RUNNER_TEMP,target=/checks,readonly" \
+            --workdir /work "ruby:$RUBY_VERSION" sh /source/script/ci-test
+
+  lint:
+    name: Lint (Ruby 3.3)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      BUNDLE_GEMFILE: gemfiles/activerecord_7.2.gemfile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3.14"
+          bundler: "2.3.26"
+          bundler-cache: true
+      - name: Check style and lint Ruby files
+        run: |
+          bundle exec rake rubocop
+          bundle exec rubocop --lint 'lib/**/*.rb' 'spec/**/*.rb' Appraisals 'gemfiles/*.gemfile' hstore_accessor.gemspec Rakefile

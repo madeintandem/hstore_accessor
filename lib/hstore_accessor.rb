@@ -19,8 +19,13 @@ module HstoreAccessor
   extend ActiveSupport::Concern
   include Serialization
   include Macro
+
+  # Rails 7.2 removed ActiveSupport::Deprecation.warn; use a gem-owned instance instead.
+  def self.deprecator
+    @deprecator ||= ActiveSupport::Deprecation.new("2.0", "HstoreAccessor")
+  end
 end
 
 ActiveSupport.on_load(:active_record) do
-  ActiveRecord::Base.send(:include, HstoreAccessor)
+  ActiveRecord::Base.include(HstoreAccessor)
 end
