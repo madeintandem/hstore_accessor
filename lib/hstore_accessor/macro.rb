@@ -27,7 +27,7 @@ module HstoreAccessor
           singleton_class.send(:define_method, :column_for_attribute) do |attribute|
             data_type = @@hstore_keys_and_types[attribute.to_s]
             if data_type
-              TypeHelpers.column_type_for(attribute.to_s, data_type)
+              TypeHelpers.column_type_for(attribute.to_s, data_type) { connection }
             else
               super(attribute)
             end

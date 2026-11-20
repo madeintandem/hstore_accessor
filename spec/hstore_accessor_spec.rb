@@ -330,6 +330,33 @@ describe HstoreAccessor do
   end
 
   describe "#column_for_attribute" do
+    if Gem::Version.new(ActiveRecord::VERSION::STRING) >= Gem::Version.new("7.2")
+      it "uses the model's connection when ActiveRecord::Base has no connection" do
+        config = ActiveRecord::Base.connection_db_config
+        stub_const("IsolatedRecord", Class.new(ActiveRecord::Base))
+        IsolatedRecord.abstract_class = true
+
+        begin
+          IsolatedRecord.establish_connection(config)
+          stub_const("IsolatedProduct", Class.new(IsolatedRecord))
+          IsolatedProduct.table_name = "products"
+          IsolatedProduct.hstore_accessor :options, color: :string
+
+          ActiveRecord::Base.remove_connection
+          expect { ActiveRecord::Base.connection }.to raise_error(ActiveRecord::ConnectionNotEstablished)
+          expect(IsolatedProduct.connection.select_value("SELECT 1")).to eq(1)
+
+          column = IsolatedProduct.column_for_attribute("color")
+          expect(column.type).to eq(:string)
+          expect(column.sql_type).to eq(IsolatedProduct.connection.type_to_sql(:string))
+          expect(IsolatedProduct.column_for_attribute("string_type").type).to eq(:string)
+        ensure
+          IsolatedRecord.remove_connection
+          ActiveRecord::Base.establish_connection(config)
+        end
+      end
+    end
+
     if ActiveRecord::VERSION::STRING.to_f >= 4.2
       it "preserves native column metadata" do
         column = SuperProduct.column_for_attribute("string_type")
